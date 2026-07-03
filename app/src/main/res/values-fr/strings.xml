@@ -1,0 +1,108 @@
+<resources>
+    <string name="app_name">Frontek Reads</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_favorites">Favoris</string>
+    <string name="nav_read_later">Lire plus tard</string>
+    <string name="nav_discover">Découvrir</string>
+
+    <!-- Top bar -->
+    <string name="action_refresh">Actualiser</string>
+    <string name="action_settings">Réglages</string>
+
+    <!-- Home -->
+    <string name="home_empty_title">Aucun abonnement</string>
+    <string name="home_empty_body">Va dans Découvrir pour chercher dans le catalogue ou coller l\'URL d\'un site.</string>
+    <string name="filter_all">Toutes</string>
+    <string name="home_summary">%1$s · %2$s</string>
+
+    <!-- Article card / reader toggles -->
+    <string name="fav_add">Ajouter aux favoris</string>
+    <string name="fav_remove">Retirer des favoris</string>
+    <string name="read_later_add">Lire plus tard</string>
+    <string name="read_later_remove">Retirer de Lire plus tard</string>
+
+    <!-- Saved collections -->
+    <string name="saved_favorites_title">Favoris</string>
+    <string name="saved_read_later_title">Lire plus tard</string>
+    <string name="saved_favorites_empty">Touche le cœur d\'un article pour l\'enregistrer ici.</string>
+    <string name="saved_read_later_empty">Touche le marque-page d\'un article pour le lire plus tard.</string>
+    <string name="saved_count">%1$s · %2$d</string>
+
+    <!-- Discover -->
+    <string name="discover_search_placeholder">Cherche dans le catalogue ou colle une URL…</string>
+    <string name="discover_custom_url_label">URL PERSONNALISÉE</string>
+    <string name="discover_find_subscribe">Trouver et s\'abonner</string>
+    <string name="discover_searching">Recherche…</string>
+    <string name="discover_subscribe">S\'abonner</string>
+    <string name="discover_subscribed">✓ Abonné</string>
+    <string name="discover_no_match">Aucun résultat dans le catalogue pour « %1$s ». Si c\'est un site, colle son URL complète pour t\'abonner.</string>
+    <string name="discover_loading_catalog">Chargement du catalogue…</string>
+    <string name="discover_your_subs">Tes abonnements</string>
+    <string name="action_import">Importer</string>
+    <string name="action_export">Exporter</string>
+    <string name="discover_subs_empty">Aucun abonnement pour l\'instant. Cherche ci-dessus ou colle une URL.</string>
+    <string name="action_remove">Retirer</string>
+
+    <!-- Reader -->
+    <string name="reader_close">Fermer</string>
+    <string name="reader_open_original">Ouvrir l\'original</string>
+    <string name="reader_read_full">Lire l\'article entier</string>
+    <string name="reader_loading_full">Chargement de l\'article entier…</string>
+    <string name="reader_feed_preview_note">Aperçu du flux — ce site ne permet pas la lecture complète depuis ici.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Réglages</string>
+    <string name="settings_body">%1$d abonnements. Les flux sont récupérés directement, sans proxy ni compte : tout reste sur l\'appareil.</string>
+    <string name="settings_language">Langue</string>
+    <string name="lang_system">Par défaut du système</string>
+    <string name="lang_italian">Italiano</string>
+    <string name="lang_english">English</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_french">Français</string>
+    <string name="settings_clear_cache">Vider le cache</string>
+    <string name="settings_delete_all">Supprimer toutes les données</string>
+    <string name="action_close">Fermer</string>
+    <string name="confirm_delete_title">Tout supprimer ?</string>
+    <string name="confirm_delete_body">Supprime tous les abonnements et le cache de cet appareil.</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="action_cancel">Annuler</string>
+
+    <!-- Toasts -->
+    <string name="toast_already_subscribed_named">Déjà abonné à « %1$s ».</string>
+    <string name="toast_subscribed_named">Abonné à « %1$s ».</string>
+    <string name="toast_unsubscribed">Désabonné.</string>
+    <string name="toast_already_subscribed">Déjà abonné.</string>
+    <string name="toast_no_feed_found">Aucun flux RSS/Atom trouvé là.</string>
+    <string name="toast_load_failed">Impossible de charger : %1$s.</string>
+    <string name="toast_nothing_export">Rien à exporter pour l\'instant.</string>
+    <string name="toast_export_ok">Abonnements exportés.</string>
+    <string name="toast_export_fail">Échec de l\'export.</string>
+    <string name="toast_import_read_fail">Impossible de lire ce fichier.</string>
+    <string name="toast_no_new_feeds">Aucun nouveau flux dans ce fichier.</string>
+    <string name="toast_cache_cleared">Cache vidé.</string>
+    <string name="toast_all_deleted">Toutes les données supprimées.</string>
+    <string name="toast_fav_added">Ajouté aux favoris.</string>
+    <string name="toast_fav_removed">Retiré des favoris.</string>
+    <string name="toast_read_later_added">Enregistré dans Lire plus tard.</string>
+    <string name="toast_read_later_removed">Retiré de Lire plus tard.</string>
+
+    <!-- Relative time -->
+    <string name="time_minutes_ago">il y a %1$dmin</string>
+    <string name="time_hours_ago">il y a %1$dh</string>
+    <string name="time_days_ago">il y a %1$dj</string>
+
+    <plurals name="subscriptions_count">
+        <item quantity="one">%d abonnement</item>
+        <item quantity="other">%d abonnements</item>
+    </plurals>
+    <plurals name="articles_count">
+        <item quantity="one">%d article</item>
+        <item quantity="other">%d articles</item>
+    </plurals>
+    <plurals name="feeds_imported">
+        <item quantity="one">%d flux importé.</item>
+        <item quantity="other">%d flux importés.</item>
+    </plurals>
+</resources>

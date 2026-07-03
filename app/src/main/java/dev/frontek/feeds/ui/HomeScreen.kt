@@ -18,8 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.frontek.feeds.R
 import dev.frontek.feeds.model.Article
 
 @Composable
@@ -43,7 +46,11 @@ fun HomeScreen(
     ) {
         item {
             Text(
-                text = "${subs.size} iscrizion${if (subs.size > 1) "i" else "e"} · ${vm.homeItems.size} articoli",
+                text = stringResource(
+                    R.string.home_summary,
+                    pluralStringResource(R.plurals.subscriptions_count, subs.size, subs.size),
+                    pluralStringResource(R.plurals.articles_count, vm.homeItems.size, vm.homeItems.size),
+                ),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -77,7 +84,7 @@ private fun SourceFilters(vm: AppViewModel) {
             FilterChip(
                 selected = vm.activeSource == null,
                 onClick = { vm.setSourceFilter(null) },
-                label = { Text("Tutte") },
+                label = { Text(stringResource(R.string.filter_all)) },
             )
         }
         items(vm.subscriptions, key = { it.feed }) { sub ->
@@ -98,13 +105,13 @@ private fun EmptyHome(contentPadding: PaddingValues) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                "Nessuna iscrizione",
+                stringResource(R.string.home_empty_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.size(8.dp))
             Text(
-                "Vai su Scopri per cercare nel catalogo o incollare l'URL di un sito.",
+                stringResource(R.string.home_empty_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

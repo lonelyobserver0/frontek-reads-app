@@ -26,9 +26,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.frontek.feeds.R
 import dev.frontek.feeds.model.Article
 
 @Composable
@@ -40,6 +43,7 @@ fun ArticleCard(
     onToggleFavorite: (Article) -> Unit,
     onToggleReadLater: (Article) -> Unit,
 ) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,7 +73,7 @@ fun ArticleCard(
                 if (article.date > 0) {
                     Spacer(Modifier.size(8.dp))
                     Text(
-                        fmtDate(article.date),
+                        fmtDate(article.date, context),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -100,14 +104,14 @@ fun ArticleCard(
                 IconButton(onClick = { onToggleReadLater(article) }) {
                     Icon(
                         imageVector = if (isReadLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                        contentDescription = if (isReadLater) "Rimuovi da Leggi più tardi" else "Leggi più tardi",
+                        contentDescription = stringResource(if (isReadLater) R.string.read_later_remove else R.string.read_later_add),
                         tint = if (isReadLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 IconButton(onClick = { onToggleFavorite(article) }) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = if (isFavorite) "Rimuovi dai preferiti" else "Aggiungi ai preferiti",
+                        contentDescription = stringResource(if (isFavorite) R.string.fav_remove else R.string.fav_add),
                         tint = if (isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }

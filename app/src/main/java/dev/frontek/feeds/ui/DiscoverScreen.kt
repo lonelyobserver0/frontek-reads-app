@@ -33,9 +33,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.frontek.feeds.R
 import dev.frontek.feeds.feed.UrlUtils
 import dev.frontek.feeds.model.CatalogEntry
 
@@ -75,7 +77,7 @@ fun DiscoverScreen(
                 value = query,
                 onValueChange = { query = it },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                placeholder = { Text("Cerca nel catalogo o incolla un URL…") },
+                placeholder = { Text(stringResource(R.string.discover_search_placeholder)) },
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
                 singleLine = true,
             )
@@ -106,9 +108,9 @@ fun DiscoverScreen(
             item {
                 Text(
                     if (query.isNotBlank()) {
-                        "Nessun risultato per “$query”. Se è un sito, incolla l'URL completo per iscriverti."
+                        stringResource(R.string.discover_no_match, query)
                     } else {
-                        "Caricamento catalogo…"
+                        stringResource(R.string.discover_loading_catalog)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -157,10 +159,10 @@ private fun CatalogCard(vm: AppViewModel, entry: CatalogEntry) {
             )
             Spacer(Modifier.size(8.dp))
             if (vm.isSubscribed(entry.feed)) {
-                OutlinedButton(onClick = {}, enabled = false) { Text("✓ Iscritto") }
+                OutlinedButton(onClick = {}, enabled = false) { Text(stringResource(R.string.discover_subscribed)) }
             } else {
                 Button(onClick = { vm.subscribe(entry.title, entry.feed, entry.site) }) {
-                    Text("Iscriviti")
+                    Text(stringResource(R.string.discover_subscribe))
                 }
             }
         }
@@ -177,7 +179,7 @@ private fun AddByUrlCard(vm: AppViewModel, url: String, onDone: () -> Unit) {
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                "URL PERSONALIZZATO",
+                stringResource(R.string.discover_custom_url_label),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
             )
@@ -201,7 +203,7 @@ private fun AddByUrlCard(vm: AppViewModel, url: String, onDone: () -> Unit) {
                     }
                 },
             ) {
-                Text(if (busy) "Cerco…" else "Trova e iscriviti")
+                Text(stringResource(if (busy) R.string.discover_searching else R.string.discover_find_subscribe))
             }
         }
     }
@@ -217,17 +219,17 @@ private fun SubscriptionsSection(
         Spacer(Modifier.size(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Le tue iscrizioni",
+                stringResource(R.string.discover_your_subs),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
             )
-            TextButton(onClick = onImport) { Text("Importa") }
-            TextButton(onClick = onExport) { Text("Esporta") }
+            TextButton(onClick = onImport) { Text(stringResource(R.string.action_import)) }
+            TextButton(onClick = onExport) { Text(stringResource(R.string.action_export)) }
         }
         if (vm.subscriptions.isEmpty()) {
             Text(
-                "Ancora nessuna iscrizione. Cerca sopra o incolla un URL.",
+                stringResource(R.string.discover_subs_empty),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -247,7 +249,7 @@ private fun SubscriptionsSection(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-                    TextButton(onClick = { vm.unsubscribe(sub.feed) }) { Text("Rimuovi") }
+                    TextButton(onClick = { vm.unsubscribe(sub.feed) }) { Text(stringResource(R.string.action_remove)) }
                 }
             }
         }

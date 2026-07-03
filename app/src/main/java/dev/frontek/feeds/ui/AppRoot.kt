@@ -37,7 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import dev.frontek.feeds.R
 
 private enum class Tab { Home, Favorites, ReadLater, Discover }
 
@@ -67,10 +69,10 @@ fun AppRoot(vm: AppViewModel) {
                     title = { Text("frontek reads", fontWeight = FontWeight.Bold) },
                     actions = {
                         IconButton(onClick = { vm.refreshAll(force = true) }) {
-                            Icon(Icons.Filled.Refresh, contentDescription = "Aggiorna")
+                            Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.action_refresh))
                         }
                         IconButton(onClick = { showSettings = true }) {
-                            Icon(Icons.Filled.Settings, contentDescription = "Impostazioni")
+                            Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.action_settings))
                         }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -84,25 +86,25 @@ fun AppRoot(vm: AppViewModel) {
                         selected = tab == Tab.Home,
                         onClick = { tab = Tab.Home },
                         icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
-                        label = { Text("Home") },
+                        label = { Text(stringResource(R.string.nav_home)) },
                     )
                     NavigationBarItem(
                         selected = tab == Tab.Favorites,
                         onClick = { tab = Tab.Favorites },
                         icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
-                        label = { Text("Preferiti") },
+                        label = { Text(stringResource(R.string.nav_favorites)) },
                     )
                     NavigationBarItem(
                         selected = tab == Tab.ReadLater,
                         onClick = { tab = Tab.ReadLater },
                         icon = { Icon(Icons.Filled.Bookmark, contentDescription = null) },
-                        label = { Text("Leggi dopo") },
+                        label = { Text(stringResource(R.string.nav_read_later)) },
                     )
                     NavigationBarItem(
                         selected = tab == Tab.Discover,
                         onClick = { tab = Tab.Discover },
                         icon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                        label = { Text("Scopri") },
+                        label = { Text(stringResource(R.string.nav_discover)) },
                     )
                 }
             },
@@ -113,16 +115,16 @@ fun AppRoot(vm: AppViewModel) {
                     Tab.Favorites -> SavedScreen(
                         vm = vm,
                         items = vm.favorites,
-                        title = "Preferiti",
-                        emptyText = "Tocca il cuore su un articolo per salvarlo qui.",
+                        title = stringResource(R.string.saved_favorites_title),
+                        emptyText = stringResource(R.string.saved_favorites_empty),
                         contentPadding = padding,
                         onOpenArticle = { reader = it },
                     )
                     Tab.ReadLater -> SavedScreen(
                         vm = vm,
                         items = vm.readLaterItems,
-                        title = "Leggi più tardi",
-                        emptyText = "Tocca il segnalibro su un articolo per leggerlo più tardi.",
+                        title = stringResource(R.string.saved_read_later_title),
+                        emptyText = stringResource(R.string.saved_read_later_empty),
                         contentPadding = padding,
                         onOpenArticle = { reader = it },
                     )

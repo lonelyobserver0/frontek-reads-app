@@ -1,0 +1,108 @@
+<resources>
+    <string name="app_name">Frontek Reads</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Preferiti</string>
+    <string name="nav_read_later">Leggi dopo</string>
+    <string name="nav_discover">Scopri</string>
+
+    <!-- Top bar -->
+    <string name="action_refresh">Aggiorna</string>
+    <string name="action_settings">Impostazioni</string>
+
+    <!-- Home -->
+    <string name="home_empty_title">Nessuna iscrizione</string>
+    <string name="home_empty_body">Vai su Scopri per cercare nel catalogo o incollare l\'URL di un sito.</string>
+    <string name="filter_all">Tutte</string>
+    <string name="home_summary">%1$s · %2$s</string>
+
+    <!-- Article card / reader toggles -->
+    <string name="fav_add">Aggiungi ai preferiti</string>
+    <string name="fav_remove">Rimuovi dai preferiti</string>
+    <string name="read_later_add">Leggi più tardi</string>
+    <string name="read_later_remove">Rimuovi da Leggi più tardi</string>
+
+    <!-- Saved collections -->
+    <string name="saved_favorites_title">Preferiti</string>
+    <string name="saved_read_later_title">Leggi più tardi</string>
+    <string name="saved_favorites_empty">Tocca il cuore su un articolo per salvarlo qui.</string>
+    <string name="saved_read_later_empty">Tocca il segnalibro su un articolo per leggerlo più tardi.</string>
+    <string name="saved_count">%1$s · %2$d</string>
+
+    <!-- Discover -->
+    <string name="discover_search_placeholder">Cerca nel catalogo o incolla un URL…</string>
+    <string name="discover_custom_url_label">URL PERSONALIZZATO</string>
+    <string name="discover_find_subscribe">Trova e iscriviti</string>
+    <string name="discover_searching">Cerco…</string>
+    <string name="discover_subscribe">Iscriviti</string>
+    <string name="discover_subscribed">✓ Iscritto</string>
+    <string name="discover_no_match">Nessun risultato per “%1$s”. Se è un sito, incolla l\'URL completo per iscriverti.</string>
+    <string name="discover_loading_catalog">Caricamento catalogo…</string>
+    <string name="discover_your_subs">Le tue iscrizioni</string>
+    <string name="action_import">Importa</string>
+    <string name="action_export">Esporta</string>
+    <string name="discover_subs_empty">Ancora nessuna iscrizione. Cerca sopra o incolla un URL.</string>
+    <string name="action_remove">Rimuovi</string>
+
+    <!-- Reader -->
+    <string name="reader_close">Chiudi</string>
+    <string name="reader_open_original">Apri originale</string>
+    <string name="reader_read_full">Leggi articolo intero</string>
+    <string name="reader_loading_full">Carico l\'articolo intero…</string>
+    <string name="reader_feed_preview_note">Anteprima dal feed — questo sito non permette la lettura completa da qui.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_body">%1$d iscrizioni. I feed vengono scaricati direttamente, senza proxy né account: tutto resta sul dispositivo.</string>
+    <string name="settings_language">Lingua</string>
+    <string name="lang_system">Predefinita di sistema</string>
+    <string name="lang_italian">Italiano</string>
+    <string name="lang_english">English</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_french">Français</string>
+    <string name="settings_clear_cache">Svuota la cache</string>
+    <string name="settings_delete_all">Elimina tutti i dati</string>
+    <string name="action_close">Chiudi</string>
+    <string name="confirm_delete_title">Eliminare tutto?</string>
+    <string name="confirm_delete_body">Rimuove tutte le iscrizioni e la cache da questo dispositivo.</string>
+    <string name="action_delete">Elimina</string>
+    <string name="action_cancel">Annulla</string>
+
+    <!-- Toasts -->
+    <string name="toast_already_subscribed_named">Già iscritto a “%1$s”.</string>
+    <string name="toast_subscribed_named">Iscritto a “%1$s”.</string>
+    <string name="toast_unsubscribed">Iscrizione rimossa.</string>
+    <string name="toast_already_subscribed">Già iscritto.</string>
+    <string name="toast_no_feed_found">Nessun feed RSS/Atom trovato lì.</string>
+    <string name="toast_load_failed">Impossibile caricare: %1$s.</string>
+    <string name="toast_nothing_export">Niente da esportare.</string>
+    <string name="toast_export_ok">Iscrizioni esportate.</string>
+    <string name="toast_export_fail">Esportazione fallita.</string>
+    <string name="toast_import_read_fail">Impossibile leggere quel file.</string>
+    <string name="toast_no_new_feeds">Nessun feed nuovo nel file.</string>
+    <string name="toast_cache_cleared">Cache svuotata.</string>
+    <string name="toast_all_deleted">Tutti i dati eliminati.</string>
+    <string name="toast_fav_added">Aggiunto ai preferiti.</string>
+    <string name="toast_fav_removed">Rimosso dai preferiti.</string>
+    <string name="toast_read_later_added">Salvato in Leggi più tardi.</string>
+    <string name="toast_read_later_removed">Rimosso da Leggi più tardi.</string>
+
+    <!-- Relative time -->
+    <string name="time_minutes_ago">%1$dm fa</string>
+    <string name="time_hours_ago">%1$dh fa</string>
+    <string name="time_days_ago">%1$dg fa</string>
+
+    <plurals name="subscriptions_count">
+        <item quantity="one">%d iscrizione</item>
+        <item quantity="other">%d iscrizioni</item>
+    </plurals>
+    <plurals name="articles_count">
+        <item quantity="one">%d articolo</item>
+        <item quantity="other">%d articoli</item>
+    </plurals>
+    <plurals name="feeds_imported">
+        <item quantity="one">Importato %d feed.</item>
+        <item quantity="other">Importati %d feed.</item>
+    </plurals>
+</resources>

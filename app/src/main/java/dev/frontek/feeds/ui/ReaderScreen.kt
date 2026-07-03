@@ -42,10 +42,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import dev.frontek.feeds.R
 import dev.frontek.feeds.feed.HtmlUtils
 import dev.frontek.feeds.model.Article
 import dev.frontek.feeds.net.Http
@@ -101,7 +103,7 @@ fun ReaderScreen(
                 note = null
                 fullLoaded = true
             } catch (e: Exception) {
-                note = "Anteprima dal feed — questo sito non permette la lettura completa da qui."
+                note = context.getString(R.string.reader_feed_preview_note)
             } finally {
                 loadingFull = false
             }
@@ -140,27 +142,27 @@ fun ReaderScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = onClose) {
-                            Icon(Icons.Filled.Close, contentDescription = "Chiudi")
+                            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.reader_close))
                         }
                     },
                     actions = {
                         IconButton(onClick = onToggleReadLater) {
                             Icon(
                                 imageVector = if (isReadLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                                contentDescription = if (isReadLater) "Rimuovi da Leggi più tardi" else "Leggi più tardi",
+                                contentDescription = stringResource(if (isReadLater) R.string.read_later_remove else R.string.read_later_add),
                                 tint = if (isReadLater) MaterialTheme.colorScheme.primary else LocalContentColor.current,
                             )
                         }
                         IconButton(onClick = onToggleFavorite) {
                             Icon(
                                 imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                contentDescription = if (isFavorite) "Rimuovi dai preferiti" else "Aggiungi ai preferiti",
+                                contentDescription = stringResource(if (isFavorite) R.string.fav_remove else R.string.fav_add),
                                 tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current,
                             )
                         }
                         if (article.link.isNotBlank()) {
                             IconButton(onClick = { openExternal(context, article.link) }) {
-                                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Apri originale")
+                                Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.reader_open_original))
                             }
                         }
                     },
@@ -190,7 +192,7 @@ fun ReaderScreen(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         Button(enabled = !loadingFull, onClick = { loadFull(auto = false) }) {
-                            Text(if (loadingFull) "Carico l'articolo intero…" else "Leggi articolo intero")
+                            Text(stringResource(if (loadingFull) R.string.reader_loading_full else R.string.reader_read_full))
                         }
                     }
                 }

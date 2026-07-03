@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base theme for a Compose app: no ActionBar, colors handled in Compose. -->
-    <style name="Theme.FrontekReads" parent="android:Theme.Material.Light.NoActionBar">
+    <!-- Base theme: AppCompat DayNight (required by AppCompatActivity), no ActionBar.
+         Actual colors are handled in Compose. -->
+    <style name="Theme.FrontekReads" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/brand_dark</item>
         <item name="android:windowBackground">@color/brand_cream</item>
     </style>

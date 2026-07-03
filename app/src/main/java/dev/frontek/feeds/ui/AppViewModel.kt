@@ -5,8 +5,10 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import dev.frontek.feeds.R
 import dev.frontek.feeds.data.CatalogRepository
 import dev.frontek.feeds.data.Opml
 import dev.frontek.feeds.data.Store
@@ -62,6 +64,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun consumeToast() { toast = null }
     private fun notify(msg: String) { toast = msg }
+    private fun str(@StringRes id: Int, vararg args: Any): String =
+        getApplication<Application>().getString(id, *args)
 
     fun setSourceFilter(source: String?) { activeSource = source }
 
@@ -92,12 +96,12 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun toggleFavorite(a: Article) {
         updateSaved(a, toggleFavorite = true)
-        notify(if (isFavorite(a)) "Aggiunto ai preferiti." else "Rimosso dai preferiti.")
+        notify(str(if (isFavorite(a)) R.string.toast_fav_added else R.string.toast_fav_removed))
     }
 
     fun toggleReadLater(a: Article) {
         updateSaved(a, toggleFavorite = false)
-        notify(if (isReadLater(a)) "Salvato in “Leggi più tardi”." else "Rimosso da “Leggi più tardi”.")
+        notify(str(if (isReadLater(a)) R.string.toast_read_later_added else R.string.toast_read_later_removed))
     }
 
     private fun updateSaved(a: Article, toggleFavorite: Boolean) {
@@ -129,7 +133,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun subscribe(title: String, feed: String, site: String?) {
         if (isSubscribed(feed)) {
-            notify("Già iscritto a “$title”.")
+            notify(str(R.string.toast_already_subscribed_named, title))
             return
         }
         val sub = Subscription(
@@ -139,7 +143,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         )
         subscriptions = subscriptions + sub
         store.saveSubs(subscriptions)
-        notify("Iscritto a “${sub.title}”.")
+        notify(str(R.string.toast_subscribed_named, sub.title))
         refreshAll(force = false)
     }
 
@@ -151,7 +155,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         if (activeSource != null && subscriptions.none { it.title == activeSource }) activeSource = null
         val liveTitles = subscriptions.map { it.title }.toSet()
         homeItems = homeItems.filter { it.source in liveTitles }
-        notify("Iscrizione rimossa.")
+        notify(str(R.string.toast_unsubscribed))
     }
 
     fun addByUrl(input: String, onDone: (Boolean) -> Unit) {
@@ -159,13 +163,13 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val found: Discovered = withContext(Dispatchers.IO) { FeedDiscovery.discover(input) }
                 if (isSubscribed(found.feed)) {
-                    notify("Già iscritto.")
+                    notify(str(R.string.toast_already_subscribed))
                 } else {
                     subscribe(found.title, found.feed, found.site)
                 }
                 onDone(true)
             } catch (e: Exception) {
-                notify("Nessun feed RSS/Atom trovato lì.")
+                notify(str(R.string.toast_no_feed_found))
                 onDone(false)
             }
         }
@@ -210,7 +214,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
             val failures = results.mapNotNull { it.failure }
             statusMessage = if (failures.isNotEmpty()) {
-                "Impossibile caricare: ${failures.joinToString(", ")}."
+                str(R.string.toast_load_failed, failures.joinToString(", "))
             } else {
                 null
             }
@@ -254,7 +258,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun exportOpmlTo(uri: Uri) {
         if (subscriptions.isEmpty()) {
-            notify("Niente da esportare.")
+            notify(str(R.string.toast_nothing_export))
             return
         }
         viewModelScope.launch {
@@ -268,7 +272,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                     false
                 }
             }
-            notify(if (ok) "Iscrizioni esportate." else "Esportazione fallita.")
+            notify(str(if (ok) R.string.toast_export_ok else R.string.toast_export_fail))
         }
     }
 
@@ -284,7 +288,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }
             if (parsed == null) {
-                notify("Impossibile leggere quel file.")
+                notify(str(R.string.toast_import_read_fail))
                 return@launch
             }
             var added = 0
@@ -297,7 +301,14 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             }
             subscriptions = current
             store.saveSubs(subscriptions)
-            notify(if (added > 0) "Importati $added feed." else "Nessun feed nuovo nel file.")
+            notify(
+                if (added > 0) {
+                    getApplication<Application>().resources
+                        .getQuantityString(R.plurals.feeds_imported, added, added)
+                } else {
+                    str(R.string.toast_no_new_feeds)
+                },
+            )
             if (added > 0) refreshAll(force = false)
         }
     }
@@ -307,7 +318,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     fun clearCache() {
         cache.clear()
         store.clearCache()
-        notify("Cache svuotata.")
+        notify(str(R.string.toast_cache_cleared))
         refreshAll(force = true)
     }
 
@@ -318,6 +329,6 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         activeSource = null
         saved = emptyList()
         store.clearAll()
-        notify("Tutti i dati eliminati.")
+        notify(str(R.string.toast_all_deleted))
     }
 }

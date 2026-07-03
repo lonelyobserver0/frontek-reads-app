@@ -34,7 +34,13 @@ reader, OPML) is ported one-to-one.
   allowlist before display (no `script`, `iframe`, `on*`, `javascript:`).
 - **OPML / JSON** — import and export your subscriptions via the system file
   picker (SAF) for backup and portability.
-- **Settings** — clear the article cache or wipe all local data.
+- **Localization** — English, Italian, Spanish and French. The app defaults to
+  **English** and automatically follows the system language when it is one of the
+  supported locales. A language selector in Settings (System / Italiano / English
+  / Español / Français) lets you override it per-app; the choice persists across
+  restarts and the app also appears in the Android 13+ system language picker.
+- **Settings** — pick the language, clear the article cache, or wipe all local
+  data.
 
 ## Tech stack
 
@@ -46,6 +52,10 @@ reader, OPML) is ported one-to-one.
 - **org.json** (bundled with Android) for the catalog and persistence — no extra
   serialization dependency. Subscriptions and cache are stored as JSON files in
   the app's `filesDir`.
+- **Localization** via string resources: English is the default (`values/`),
+  with `values-it/`, `values-es/`, `values-fr/`. Per-app language override uses
+  AppCompat locales (`AppCompatDelegate.setApplicationLocales`), persisted
+  automatically; `generateLocaleConfig` wires up the system language picker.
 - `minSdk 24`, `targetSdk 36`, `applicationId` / namespace `dev.frontek.feeds`.
 
 ## Project layout
