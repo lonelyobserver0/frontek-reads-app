@@ -17,3 +17,7 @@ local.properties
 /app/build
 *.apk
 *.aab
+# Signing — never commit the keystore or its passwords
+*.keystore
+*.jks
+keystore.properties
