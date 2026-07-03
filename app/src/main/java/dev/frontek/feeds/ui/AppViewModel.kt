@@ -12,18 +12,22 @@ import dev.frontek.feeds.R
 import dev.frontek.feeds.data.CatalogRepository
 import dev.frontek.feeds.data.Opml
 import dev.frontek.feeds.data.Store
+import dev.frontek.feeds.feed.CatalogSearch
 import dev.frontek.feeds.feed.Discovered
 import dev.frontek.feeds.feed.FeedDiscovery
 import dev.frontek.feeds.feed.FeedParser
+import dev.frontek.feeds.feed.FeedSearch
 import dev.frontek.feeds.feed.UrlUtils
 import dev.frontek.feeds.model.Article
 import dev.frontek.feeds.model.CachedFeed
 import dev.frontek.feeds.model.CatalogEntry
 import dev.frontek.feeds.model.FeedItem
+import dev.frontek.feeds.model.FeedResult
 import dev.frontek.feeds.model.SavedArticle
 import dev.frontek.feeds.model.Subscription
 import dev.frontek.feeds.net.Http
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -35,6 +39,9 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private companion object {
         const val CACHE_TTL = 15 * 60 * 1000L
         const val MAX_ITEMS_PER_FEED = 20
+        const val FONT_MIN = 0.8f
+        const val FONT_MAX = 1.8f
+        const val FONT_STEP = 0.1f
     }
 
     private val store = Store(app)
@@ -56,6 +63,15 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var saved by mutableStateOf<List<SavedArticle>>(store.loadSaved())
         private set
+    var fontScale by mutableStateOf(store.loadFontScale())
+        private set
+    var searchResults by mutableStateOf<List<FeedResult>>(emptyList())
+        private set
+    var searching by mutableStateOf(false)
+        private set
+    var searchUsedFallback by mutableStateOf(false)
+        private set
+    private var searchJob: Job? = null
 
     init {
         catalog = CatalogRepository.load(app)
@@ -69,10 +85,59 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setSourceFilter(source: String?) { activeSource = source }
 
+    // ---- font size ----
+
+    val canDecreaseFont: Boolean get() = fontScale > FONT_MIN + 1e-3f
+    val canIncreaseFont: Boolean get() = fontScale < FONT_MAX - 1e-3f
+    val fontScalePercent: Int get() = Math.round(fontScale * 100)
+
+    private fun applyFontScale(scale: Float) {
+        val clamped = scale.coerceIn(FONT_MIN, FONT_MAX)
+        fontScale = clamped
+        store.saveFontScale(clamped)
+    }
+
+    fun increaseFont() = applyFontScale(fontScale + FONT_STEP)
+    fun decreaseFont() = applyFontScale(fontScale - FONT_STEP)
+    fun resetFont() = applyFontScale(1.0f)
+
     val filteredItems: List<Article>
         get() = activeSource?.let { src -> homeItems.filter { it.source == src } } ?: homeItems
 
     fun isSubscribed(feedUrl: String): Boolean = subscriptions.any { it.feed == feedUrl }
+
+    // ---- discover: dynamic feed search ----
+
+    private fun CatalogEntry.toResult(): FeedResult =
+        FeedResult(title, feed, site, category, description = null, iconUrl = null)
+
+    /** Local catalog as Discover results — shown as suggestions when the query is empty. */
+    val suggestions: List<FeedResult> get() = catalog.map { it.toResult() }
+
+    /** Search feeds across the web (Feedly); falls back to the local catalog on failure. */
+    fun search(query: String) {
+        searchJob?.cancel()
+        val q = query.trim()
+        if (q.isEmpty()) {
+            searchResults = emptyList()
+            searching = false
+            searchUsedFallback = false
+            return
+        }
+        searchJob = viewModelScope.launch {
+            searching = true
+            searchUsedFallback = false
+            val web = FeedSearch.search(q)
+            if (!web.isNullOrEmpty()) {
+                searchResults = web
+                searchUsedFallback = false
+            } else {
+                searchResults = CatalogSearch.filter(catalog, q).map { it.toResult() }
+                searchUsedFallback = true
+            }
+            searching = false
+        }
+    }
 
     // ---- saved collections (favorites / read later) ----
 

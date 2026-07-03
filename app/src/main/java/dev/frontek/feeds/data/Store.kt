@@ -19,6 +19,7 @@ class Store(context: Context) {
     private val subsFile = File(context.filesDir, "subs.json")
     private val cacheFile = File(context.filesDir, "cache.json")
     private val savedFile = File(context.filesDir, "saved.json")
+    private val settingsFile = File(context.filesDir, "settings.json")
 
     // ---- subscriptions ----
 
@@ -157,6 +158,19 @@ class Store(context: Context) {
             )
         }
         write(savedFile, arr.toString())
+    }
+
+    // ---- UI preferences ----
+
+    fun loadFontScale(): Float = try {
+        val text = readOrNull(settingsFile) ?: return 1.0f
+        JSONObject(text).optDouble("fontScale", 1.0).toFloat()
+    } catch (e: Exception) {
+        1.0f
+    }
+
+    fun saveFontScale(scale: Float) {
+        write(settingsFile, JSONObject().put("fontScale", scale.toDouble()).toString())
     }
 
     fun clearCache() {

@@ -17,10 +17,16 @@ reader, OPML) is ported one-to-one.
 
 ## Features
 
-- **Discover** — search the curated catalog (`assets/catalog.json`) by name,
-  category or site, or **paste any URL**: the app recognises whether it's already
-  a feed, otherwise it auto-discovers one (`<link rel="alternate">`, then common
-  paths `/feed`, `/rss`, `/atom.xml`, …).
+- **Discover** — a **dynamic feed search over the web** via the Feedly Cloud
+  search API (no API key). Type "tecnologia" and it finds tech feeds from across
+  the web; type "hdblog" and it finds HDblog and its sub-feeds — not limited to a
+  hand-curated list. When the query is empty (or the search service is
+  unreachable) it falls back to a bundled catalog (`assets/catalog.json`, 45+
+  feeds) for suggestions/offline use. You can also **paste any URL**: the app
+  recognises whether it's already a feed, otherwise it auto-discovers one from the
+  page's `<link rel="alternate">` tags, feed-looking links, and common paths
+  (`/feed`, `/rss`, `/atom.xml`, `?feed=rss2`, …) — each candidate is verified by
+  actually parsing it before subscribing.
 - **Home** — articles from every subscription, newest first, with a per-source
   filter. Article cards show a thumbnail (from `media:thumbnail`/`enclosure` or
   the first inline image) to the left of the title and summary when one is found.
@@ -40,7 +46,10 @@ reader, OPML) is ported one-to-one.
   supported locales. A language selector in Settings (System / Italiano / English
   / Español / Français) lets you override it per-app; the choice persists across
   restarts and the app also appears in the Android 13+ system language picker.
-- **Settings** — pick the language, clear the article cache, or wipe all local
+- **Adjustable text size** — a stepper in Settings scales the app font from 80%
+  to 180% (on top of the system font scale). It applies everywhere, including the
+  in-app reader (WebView `textZoom`), and persists across restarts.
+- **Settings** — text size, language, clear the article cache, or wipe all local
   data.
 
 ## Tech stack
@@ -99,5 +108,8 @@ Add entries to `app/src/main/assets/catalog.json`:
 
 ## Privacy
 
-No account, no tracking. Subscriptions and the article cache never leave the
-device; feeds are fetched directly from their publishers.
+No account, no tracking. Subscriptions, saved articles and the cache never leave
+the device, and feeds are fetched directly from their publishers. The one
+exception is **Discover search**: the text you type there is sent to the Feedly
+Cloud search API to find matching feeds across the web. Browsing your Home,
+reading, and everything else stay fully local.

@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
@@ -21,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.frontek.feeds.R
 
@@ -39,6 +44,37 @@ fun SettingsDialog(vm: AppViewModel, onDismiss: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+
+                Spacer(Modifier.size(16.dp))
+                Text(
+                    stringResource(R.string.settings_text_size),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    OutlinedButton(
+                        onClick = { vm.decreaseFont() },
+                        enabled = vm.canDecreaseFont,
+                    ) { Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.font_decrease)) }
+                    Text(
+                        "${vm.fontScalePercent}%",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedButton(
+                        onClick = { vm.increaseFont() },
+                        enabled = vm.canIncreaseFont,
+                    ) { Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.font_increase)) }
+                }
+                TextButton(
+                    onClick = { vm.resetFont() },
+                    modifier = Modifier.align(Alignment.End),
+                ) { Text(stringResource(R.string.font_reset)) }
 
                 Spacer(Modifier.size(16.dp))
                 Text(

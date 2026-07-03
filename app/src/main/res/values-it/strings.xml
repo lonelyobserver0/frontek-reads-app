@@ -39,6 +39,7 @@
     <string name="discover_subscribed">✓ Iscritto</string>
     <string name="discover_no_match">Nessun risultato per “%1$s”. Se è un sito, incolla l\'URL completo per iscriverti.</string>
     <string name="discover_loading_catalog">Caricamento catalogo…</string>
+    <string name="discover_search_fallback">Servizio di ricerca non raggiungibile — risultati dal catalogo locale.</string>
     <string name="discover_your_subs">Le tue iscrizioni</string>
     <string name="action_import">Importa</string>
     <string name="action_export">Esporta</string>
@@ -55,6 +56,10 @@
     <!-- Settings -->
     <string name="settings_title">Impostazioni</string>
     <string name="settings_body">%1$d iscrizioni. I feed vengono scaricati direttamente, senza proxy né account: tutto resta sul dispositivo.</string>
+    <string name="settings_text_size">Dimensione testo</string>
+    <string name="font_decrease">Riduci dimensione testo</string>
+    <string name="font_increase">Aumenta dimensione testo</string>
+    <string name="font_reset">Ripristina</string>
     <string name="settings_language">Lingua</string>
     <string name="lang_system">Predefinita di sistema</string>
     <string name="lang_italian">Italiano</string>

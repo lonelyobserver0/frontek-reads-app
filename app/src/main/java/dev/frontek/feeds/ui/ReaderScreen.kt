@@ -42,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,6 +52,7 @@ import dev.frontek.feeds.R
 import dev.frontek.feeds.feed.HtmlUtils
 import dev.frontek.feeds.model.Article
 import dev.frontek.feeds.net.Http
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -205,6 +207,9 @@ fun ReaderScreen(
 @Composable
 private fun ArticleWebView(body: String, baseUrl: String, modifier: Modifier) {
     val html = remember(body) { buildPage(body) }
+    // Match the reader text to the app-wide font-size preference (density.fontScale
+    // already includes the user's scale, applied in MainActivity).
+    val textZoom = (LocalDensity.current.fontScale * 100).roundToInt()
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
@@ -231,6 +236,7 @@ private fun ArticleWebView(body: String, baseUrl: String, modifier: Modifier) {
             }
         },
         update = { web ->
+            web.settings.textZoom = textZoom
             web.loadDataWithBaseURL(baseUrl, html, "text/html", "utf-8", null)
         },
     )

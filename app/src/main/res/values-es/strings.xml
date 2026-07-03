@@ -39,6 +39,7 @@
     <string name="discover_subscribed">✓ Suscrito</string>
     <string name="discover_no_match">Sin resultados en el catálogo para “%1$s”. Si es un sitio, pega su URL completa para suscribirte.</string>
     <string name="discover_loading_catalog">Cargando catálogo…</string>
+    <string name="discover_search_fallback">Servicio de búsqueda no disponible — resultados del catálogo local.</string>
     <string name="discover_your_subs">Tus suscripciones</string>
     <string name="action_import">Importar</string>
     <string name="action_export">Exportar</string>
@@ -55,6 +56,10 @@
     <!-- Settings -->
     <string name="settings_title">Ajustes</string>
     <string name="settings_body">%1$d suscripciones. Los feeds se descargan directamente, sin proxy ni cuenta: todo permanece en el dispositivo.</string>
+    <string name="settings_text_size">Tamaño del texto</string>
+    <string name="font_decrease">Reducir tamaño del texto</string>
+    <string name="font_increase">Aumentar tamaño del texto</string>
+    <string name="font_reset">Restablecer</string>
     <string name="settings_language">Idioma</string>
     <string name="lang_system">Predeterminado del sistema</string>
     <string name="lang_italian">Italiano</string>

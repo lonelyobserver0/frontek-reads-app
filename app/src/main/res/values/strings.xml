@@ -39,6 +39,7 @@
     <string name="discover_subscribed">✓ Subscribed</string>
     <string name="discover_no_match">No catalog match for “%1$s”. If it\'s a site, paste its full URL to subscribe.</string>
     <string name="discover_loading_catalog">Loading catalog…</string>
+    <string name="discover_search_fallback">Search service unavailable — showing results from the local catalog.</string>
     <string name="discover_your_subs">Your subscriptions</string>
     <string name="action_import">Import</string>
     <string name="action_export">Export</string>
@@ -55,6 +56,10 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_body">%1$d subscriptions. Feeds are fetched directly, with no proxy or account: everything stays on the device.</string>
+    <string name="settings_text_size">Text size</string>
+    <string name="font_decrease">Decrease text size</string>
+    <string name="font_increase">Increase text size</string>
+    <string name="font_reset">Reset</string>
     <string name="settings_language">Language</string>
     <string name="lang_system">System default</string>
     <string name="lang_italian">Italiano</string>

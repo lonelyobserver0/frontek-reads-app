@@ -8,6 +8,16 @@ data class CatalogEntry(
     val category: String?,
 )
 
+/** A feed shown in Discover — from a dynamic web search or the local catalog. */
+data class FeedResult(
+    val title: String,
+    val feed: String,
+    val site: String?,
+    val category: String?,
+    val description: String?,
+    val iconUrl: String?,
+)
+
 /** A user subscription (persisted). */
 data class Subscription(
     val title: String,

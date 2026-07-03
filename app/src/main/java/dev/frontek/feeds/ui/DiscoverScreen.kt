@@ -2,7 +2,9 @@ package dev.frontek.feeds.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,12 +16,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -27,19 +31,24 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import dev.frontek.feeds.R
 import dev.frontek.feeds.feed.UrlUtils
-import dev.frontek.feeds.model.CatalogEntry
+import dev.frontek.feeds.model.FeedResult
+import kotlinx.coroutines.delay
 
 @Composable
 fun DiscoverScreen(
@@ -47,18 +56,25 @@ fun DiscoverScreen(
     contentPadding: PaddingValues,
 ) {
     var query by remember { mutableStateOf("") }
-    val q = query.trim().lowercase()
+    var debouncing by remember { mutableStateOf(false) }
 
-    val matches = vm.catalog.filter { f ->
-        q.isEmpty() ||
-            f.title.lowercase().contains(q) ||
-            (f.category ?: "").lowercase().contains(q) ||
-            (f.site ?: "").lowercase().contains(q)
+    // Debounced dynamic search: each keystroke waits, then queries the web.
+    LaunchedEffect(query) {
+        if (query.isBlank()) {
+            debouncing = false
+            vm.search("")
+        } else {
+            debouncing = true
+            delay(350)
+            vm.search(query)
+            debouncing = false
+        }
     }
-    val categories = remember(vm.catalog) {
-        vm.catalog.mapNotNull { it.category }.distinct()
-    }
+
+    val categories = remember(vm.catalog) { vm.catalog.mapNotNull { it.category }.distinct() }
     val showUrlCard = query.isNotBlank() && UrlUtils.looksLikeUrl(query)
+    val loading = debouncing || vm.searching
+    val results = if (query.isBlank()) vm.suggestions else vm.searchResults
 
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
@@ -79,10 +95,19 @@ fun DiscoverScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 placeholder = { Text(stringResource(R.string.discover_search_placeholder)) },
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    }
+                },
                 singleLine = true,
             )
         }
-        if (categories.isNotEmpty()) {
+
+        if (query.isBlank() && categories.isNotEmpty()) {
             item {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -100,18 +125,25 @@ fun DiscoverScreen(
             item { AddByUrlCard(vm, query) { query = "" } }
         }
 
-        items(matches, key = { it.feed }) { entry ->
-            CatalogCard(vm, entry)
-        }
-
-        if (matches.isEmpty() && !showUrlCard) {
+        if (query.isNotBlank() && vm.searchUsedFallback && results.isNotEmpty()) {
             item {
                 Text(
-                    if (query.isNotBlank()) {
-                        stringResource(R.string.discover_no_match, query)
-                    } else {
-                        stringResource(R.string.discover_loading_catalog)
-                    },
+                    stringResource(R.string.discover_search_fallback),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+        }
+
+        items(results, key = { it.feed }) { result ->
+            ResultCard(vm, result)
+        }
+
+        if (!loading && results.isEmpty() && query.isNotBlank() && !showUrlCard) {
+            item {
+                Text(
+                    stringResource(R.string.discover_no_match, query),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -131,40 +163,76 @@ fun DiscoverScreen(
 }
 
 @Composable
-private fun CatalogCard(vm: AppViewModel, entry: CatalogEntry) {
+private fun ResultCard(vm: AppViewModel, result: FeedResult) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(
-                (entry.category ?: "Feed").uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(Modifier.size(2.dp))
-            Text(
-                entry.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                entry.feed,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.size(8.dp))
-            if (vm.isSubscribed(entry.feed)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                FeedIcon(result)
+                Spacer(Modifier.size(12.dp))
+                Column(Modifier.weight(1f)) {
+                    result.category?.let {
+                        Text(
+                            it.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Text(
+                        result.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        result.description ?: UrlUtils.host(result.site ?: result.feed),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+            Spacer(Modifier.size(10.dp))
+            if (vm.isSubscribed(result.feed)) {
                 OutlinedButton(onClick = {}, enabled = false) { Text(stringResource(R.string.discover_subscribed)) }
             } else {
-                Button(onClick = { vm.subscribe(entry.title, entry.feed, entry.site) }) {
+                Button(onClick = { vm.subscribe(result.title, result.feed, result.site) }) {
                     Text(stringResource(R.string.discover_subscribe))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FeedIcon(result: FeedResult) {
+    Box(
+        modifier = Modifier
+            .size(44.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (!result.iconUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = result.iconUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            Text(
+                result.title.trim().take(1).uppercase(),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

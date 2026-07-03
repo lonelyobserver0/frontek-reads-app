@@ -1,9 +1,11 @@
 package dev.frontek.feeds
 
+import dev.frontek.feeds.feed.CatalogSearch
 import dev.frontek.feeds.feed.DateParser
 import dev.frontek.feeds.feed.FeedParser
 import dev.frontek.feeds.feed.HtmlUtils
 import dev.frontek.feeds.feed.UrlUtils
+import dev.frontek.feeds.model.CatalogEntry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -126,6 +128,34 @@ class FeedParsingTest {
         val clean = HtmlUtils.sanitize(dirty, "https://site.com/base/")
         assertTrue(!clean.contains("<script"))
         assertTrue(clean.contains("https://site.com/rel"))
+    }
+
+    private val catalog = listOf(
+        CatalogEntry("HDblog", "https://www.hdblog.it", "https://www.hdblog.it/feed/", "Tech"),
+        CatalogEntry("The Verge", "https://www.theverge.com", "https://www.theverge.com/rss/index.xml", "Tech"),
+        CatalogEntry("ANSA", "https://www.ansa.it", "https://www.ansa.it/rss.xml", "News"),
+        CatalogEntry("Multiplayer.it", "https://multiplayer.it", "https://multiplayer.it/feed/", "Gaming"),
+    )
+
+    @Test
+    fun searchByCategorySynonymItalian() {
+        // "tecnologia" must surface every Tech feed even though the category is "Tech".
+        val res = CatalogSearch.filter(catalog, "tecnologia").map { it.title }
+        assertTrue(res.contains("HDblog"))
+        assertTrue(res.contains("The Verge"))
+        assertTrue(!res.contains("ANSA"))
+    }
+
+    @Test
+    fun searchByNameSubstring() {
+        val res = CatalogSearch.filter(catalog, "hdblog").map { it.title }
+        assertEquals(listOf("HDblog"), res)
+    }
+
+    @Test
+    fun searchIsAccentInsensitive() {
+        assertTrue(CatalogSearch.filter(catalog, "notìzie").any { it.title == "ANSA" })
+        assertTrue(CatalogSearch.filter(catalog, "GIOCHI").any { it.title == "Multiplayer.it" })
     }
 
     @Test
