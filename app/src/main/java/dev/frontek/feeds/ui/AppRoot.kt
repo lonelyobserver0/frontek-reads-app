@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Subscriptions
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,6 +50,7 @@ fun AppRoot(vm: AppViewModel) {
     var tab by remember { mutableStateOf(Tab.Home) }
     var reader by remember { mutableStateOf<dev.frontek.feeds.model.Article?>(null) }
     var showSettings by remember { mutableStateOf(false) }
+    var showSubscriptions by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(vm.toast) {
@@ -66,8 +68,11 @@ fun AppRoot(vm: AppViewModel) {
             snackbarHost = { SnackbarHost(snackbar) },
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("frontek reads", fontWeight = FontWeight.Bold) },
+                    title = { Text("FRONTEK READS", fontWeight = FontWeight.Bold) },
                     actions = {
+                        IconButton(onClick = { showSubscriptions = true }) {
+                            Icon(Icons.Filled.Subscriptions, contentDescription = stringResource(R.string.discover_your_subs))
+                        }
                         IconButton(onClick = { vm.refreshAll(force = true) }) {
                             Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.action_refresh))
                         }
@@ -156,6 +161,14 @@ fun AppRoot(vm: AppViewModel) {
                     onClose = { reader = null },
                 )
             }
+        }
+
+        AnimatedVisibility(
+            visible = showSubscriptions,
+            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
+        ) {
+            SubscriptionsScreen(vm, onClose = { showSubscriptions = false })
         }
     }
 

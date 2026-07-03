@@ -1,7 +1,5 @@
 package dev.frontek.feeds.ui
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,13 +72,6 @@ fun DiscoverScreen(
     val showUrlCard = query.isNotBlank() && UrlUtils.looksLikeUrl(query)
     val loading = debouncing || vm.searching
     val results = if (query.isBlank()) vm.suggestions else vm.searchResults
-
-    val importLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument(),
-    ) { uri -> uri?.let { vm.importOpmlFrom(it) } }
-    val exportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("text/xml"),
-    ) { uri -> uri?.let { vm.exportOpmlTo(it) } }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -151,13 +141,6 @@ fun DiscoverScreen(
             }
         }
 
-        item {
-            SubscriptionsSection(
-                vm = vm,
-                onImport = { importLauncher.launch(arrayOf("*/*")) },
-                onExport = { exportLauncher.launch("frontek-reads.opml") },
-            )
-        }
         item { Spacer(Modifier.size(12.dp)) }
     }
 }
@@ -277,49 +260,3 @@ private fun AddByUrlCard(vm: AppViewModel, url: String, onDone: () -> Unit) {
     }
 }
 
-@Composable
-private fun SubscriptionsSection(
-    vm: AppViewModel,
-    onImport: () -> Unit,
-    onExport: () -> Unit,
-) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-        Spacer(Modifier.size(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                stringResource(R.string.discover_your_subs),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-            )
-            TextButton(onClick = onImport) { Text(stringResource(R.string.action_import)) }
-            TextButton(onClick = onExport) { Text(stringResource(R.string.action_export)) }
-        }
-        if (vm.subscriptions.isEmpty()) {
-            Text(
-                stringResource(R.string.discover_subs_empty),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        } else {
-            vm.subscriptions.forEach { sub ->
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        Text(sub.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(
-                            sub.feed,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                    TextButton(onClick = { vm.unsubscribe(sub.feed) }) { Text(stringResource(R.string.action_remove)) }
-                }
-            }
-        }
-    }
-}
