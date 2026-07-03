@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- frontek reads brand palette -->
+    <color name="brand_teal">#FF2A9D8F</color>
+    <color name="brand_coral">#FFE76F51</color>
+    <color name="brand_dark">#FF264653</color>
+    <color name="brand_gold">#FFE9C46A</color>
+    <color name="brand_green">#FF8AB17D</color>
+    <color name="brand_cream">#FFF8F6EF</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
