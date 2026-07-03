@@ -74,6 +74,7 @@ class Store(context: Context) {
                             summary = it.optString("summary"),
                             content = it.optString("content"),
                             id = it.optString("id"),
+                            image = it.optString("image").takeIf { s -> s.isNotBlank() },
                         )
                     },
                 )
@@ -96,7 +97,8 @@ class Store(context: Context) {
                         .put("date", it.date)
                         .put("summary", it.summary)
                         .put("content", it.content)
-                        .put("id", it.id),
+                        .put("id", it.id)
+                        .put("image", it.image ?: ""),
                 )
             }
             root.put(feed, JSONObject().put("t", cached.t).put("items", items))
@@ -122,6 +124,7 @@ class Store(context: Context) {
                         id = o.optString("id"),
                         source = o.optString("source"),
                         site = o.optString("site").takeIf { it.isNotBlank() },
+                        image = o.optString("image").takeIf { it.isNotBlank() },
                     ),
                     favorite = o.optBoolean("favorite"),
                     readLater = o.optBoolean("readLater"),
@@ -147,6 +150,7 @@ class Store(context: Context) {
                     .put("id", a.id)
                     .put("source", a.source)
                     .put("site", a.site ?: "")
+                    .put("image", a.image ?: "")
                     .put("favorite", s.favorite)
                     .put("readLater", s.readLater)
                     .put("savedAt", s.savedAt),

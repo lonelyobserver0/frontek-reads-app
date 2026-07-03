@@ -57,6 +57,7 @@ dependencies {
 
     implementation(libs.okhttp)
     implementation(libs.jsoup)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -252,6 +252,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         id = item.id,
         source = sub.title,
         site = sub.site,
+        image = item.image,
     )
 
     // ---- OPML / JSON ----

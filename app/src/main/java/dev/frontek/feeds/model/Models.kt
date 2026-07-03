@@ -23,6 +23,7 @@ data class FeedItem(
     val summary: String,
     val content: String,
     val id: String,
+    val image: String?,
 )
 
 /** Result of parsing a feed document. */
@@ -41,6 +42,7 @@ data class Article(
     val id: String,
     val source: String,
     val site: String?,
+    val image: String?,
 )
 
 /** Cached feed content with a fetch timestamp. */

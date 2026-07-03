@@ -33,6 +33,7 @@ object FeedParser {
                     summary = HtmlUtils.stripHtml(html),
                     content = html,
                     id = tagText(item, "guid").ifEmpty { tagText(item, "link") },
+                    image = extractImage(item, html),
                 )
             }
             return ParsedFeed(feedTitle, items)
@@ -49,6 +50,7 @@ object FeedParser {
                 summary = HtmlUtils.stripHtml(html),
                 content = html,
                 id = tagText(entry, "id").ifEmpty { atomLink(entry) },
+                image = extractImage(entry, html),
             )
         }
         return ParsedFeed(feedTitle, items)
@@ -69,6 +71,31 @@ object FeedParser {
             rawOf(node, "content:encoded").ifEmpty { rawOf(node, "description") }
         }
         return if (html.length > CONTENT_CAP) html.substring(0, CONTENT_CAP) else html
+    }
+
+    /** Best-effort lead image: media/enclosure tags, then the first content <img>. */
+    private fun extractImage(node: Element, html: String): String? {
+        node.getElementsByTag("media:thumbnail").firstOrNull()
+            ?.attr("url")?.takeIf { it.isNotBlank() }?.let { return it }
+
+        node.getElementsByTag("media:content").firstOrNull {
+            val medium = it.attr("medium")
+            val type = it.attr("type")
+            (medium == "image" || type.startsWith("image")) && it.attr("url").isNotBlank()
+        }?.attr("url")?.takeIf { it.isNotBlank() }?.let { return it }
+
+        node.getElementsByTag("enclosure").firstOrNull {
+            it.attr("type").startsWith("image") && it.attr("url").isNotBlank()
+        }?.attr("url")?.takeIf { it.isNotBlank() }?.let { return it }
+
+        node.getElementsByTag("itunes:image").firstOrNull()
+            ?.attr("href")?.takeIf { it.isNotBlank() }?.let { return it }
+
+        if (html.isNotBlank()) {
+            val src = Jsoup.parse(html).selectFirst("img[src]")?.attr("src")
+            if (!src.isNullOrBlank() && src.startsWith("http")) return src
+        }
+        return null
     }
 
     private fun atomLink(entry: Element): String {

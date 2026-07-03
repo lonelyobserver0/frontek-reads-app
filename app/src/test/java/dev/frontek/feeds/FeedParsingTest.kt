@@ -67,6 +67,51 @@ class FeedParsingTest {
     }
 
     @Test
+    fun extractsImageFromMediaThumbnail() {
+        val xml = """
+            <?xml version="1.0"?>
+            <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel>
+              <title>Pics</title>
+              <item>
+                <title>With thumb</title>
+                <link>https://example.com/a</link>
+                <media:thumbnail url="https://img.example.com/pic.jpg"/>
+                <description><![CDATA[<p>Body</p>]]></description>
+              </item>
+            </channel></rss>
+        """.trimIndent()
+        assertEquals("https://img.example.com/pic.jpg", FeedParser.parse(xml).items[0].image)
+    }
+
+    @Test
+    fun extractsImageFromContentImg() {
+        val xml = """
+            <?xml version="1.0"?>
+            <rss version="2.0"><channel>
+              <title>Pics</title>
+              <item>
+                <title>With inline img</title>
+                <link>https://example.com/b</link>
+                <description><![CDATA[<p><img src="https://cdn.example.com/inline.jpg"/> some text</p>]]></description>
+              </item>
+            </channel></rss>
+        """.trimIndent()
+        assertEquals("https://cdn.example.com/inline.jpg", FeedParser.parse(xml).items[0].image)
+    }
+
+    @Test
+    fun noImageWhenNone() {
+        val xml = """
+            <?xml version="1.0"?>
+            <rss version="2.0"><channel><title>Plain</title>
+              <item><title>No pic</title><link>https://example.com/c</link>
+              <description>Just text</description></item>
+            </channel></rss>
+        """.trimIndent()
+        assertEquals(null, FeedParser.parse(xml).items[0].image)
+    }
+
+    @Test
     fun parsesDates() {
         assertTrue(DateParser.parse("Wed, 02 Oct 2024 13:00:00 GMT") > 0)
         assertTrue(DateParser.parse("2024-10-02T13:00:00Z") > 0)

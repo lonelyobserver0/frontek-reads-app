@@ -22,7 +22,8 @@ reader, OPML) is ported one-to-one.
   a feed, otherwise it auto-discovers one (`<link rel="alternate">`, then common
   paths `/feed`, `/rss`, `/atom.xml`, …).
 - **Home** — articles from every subscription, newest first, with a per-source
-  filter.
+  filter. Article cards show a thumbnail (from `media:thumbnail`/`enclosure` or
+  the first inline image) to the left of the title and summary when one is found.
 - **Favorites & Read later** — save any article to two on-device collections via
   the heart / bookmark buttons on each card (and in the reader). Saved articles
   keep their full content, so they stay readable even after the feed cache
@@ -48,7 +49,7 @@ reader, OPML) is ported one-to-one.
   (teal `#2A9D8F`, coral `#E76F51`, dark `#264653`, cream `#F8F6EF`).
 - **Kotlin 2.3** on **AGP 9.2** (built-in Kotlin) + the Compose compiler plugin.
 - **OkHttp** for networking, **Jsoup** for feed/HTML parsing, sanitizing and
-  readability extraction.
+  readability extraction, **Coil** for async thumbnail loading.
 - **org.json** (bundled with Android) for the catalog and persistence — no extra
   serialization dependency. Subscriptions and cache are stored as JSON files in
   the app's `filesDir`.
