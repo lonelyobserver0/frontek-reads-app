@@ -48,3 +48,14 @@ data class CachedFeed(
     val t: Long,
     val items: List<FeedItem>,
 )
+
+/**
+ * An article the user saved to a collection. The full [article] is stored so it
+ * stays readable even after the feed cache has evicted it.
+ */
+data class SavedArticle(
+    val article: Article,
+    val favorite: Boolean,
+    val readLater: Boolean,
+    val savedAt: Long,
+)

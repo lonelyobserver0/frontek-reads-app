@@ -17,11 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -50,7 +55,14 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReaderScreen(article: Article, onClose: () -> Unit) {
+fun ReaderScreen(
+    article: Article,
+    isFavorite: Boolean,
+    isReadLater: Boolean,
+    onToggleFavorite: () -> Unit,
+    onToggleReadLater: () -> Unit,
+    onClose: () -> Unit,
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -132,6 +144,20 @@ fun ReaderScreen(article: Article, onClose: () -> Unit) {
                         }
                     },
                     actions = {
+                        IconButton(onClick = onToggleReadLater) {
+                            Icon(
+                                imageVector = if (isReadLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                                contentDescription = if (isReadLater) "Rimuovi da Leggi più tardi" else "Leggi più tardi",
+                                tint = if (isReadLater) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                            )
+                        }
+                        IconButton(onClick = onToggleFavorite) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = if (isFavorite) "Rimuovi dai preferiti" else "Aggiungi ai preferiti",
+                                tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current,
+                            )
+                        }
                         if (article.link.isNotBlank()) {
                             IconButton(onClick = { openExternal(context, article.link) }) {
                                 Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Apri originale")

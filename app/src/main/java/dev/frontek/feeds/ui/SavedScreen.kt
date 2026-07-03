@@ -6,33 +6,31 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.frontek.feeds.model.Article
 
 @Composable
-fun HomeScreen(
+fun SavedScreen(
     vm: AppViewModel,
+    items: List<Article>,
+    title: String,
+    emptyText: String,
     contentPadding: PaddingValues,
     onOpenArticle: (Article) -> Unit,
 ) {
-    val subs = vm.subscriptions
-    val items = vm.filteredItems
-
-    if (subs.isEmpty()) {
-        EmptyHome(contentPadding)
+    if (items.isEmpty()) {
+        EmptySaved(title, emptyText, contentPadding)
         return
     }
 
@@ -43,14 +41,11 @@ fun HomeScreen(
     ) {
         item {
             Text(
-                text = "${subs.size} iscrizion${if (subs.size > 1) "i" else "e"} · ${vm.homeItems.size} articoli",
+                text = "$title · ${items.size}",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             )
-        }
-        if (subs.size >= 2) {
-            item { SourceFilters(vm) }
         }
         items(items, key = { it.id + it.source }) { article ->
             ArticleCard(
@@ -67,46 +62,19 @@ fun HomeScreen(
 }
 
 @Composable
-private fun SourceFilters(vm: AppViewModel) {
-    LazyRow(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item {
-            FilterChip(
-                selected = vm.activeSource == null,
-                onClick = { vm.setSourceFilter(null) },
-                label = { Text("Tutte") },
-            )
-        }
-        items(vm.subscriptions, key = { it.feed }) { sub ->
-            FilterChip(
-                selected = vm.activeSource == sub.title,
-                onClick = { vm.setSourceFilter(sub.title) },
-                label = { Text(sub.title, maxLines = 1) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyHome(contentPadding: PaddingValues) {
+private fun EmptySaved(title: String, emptyText: String, contentPadding: PaddingValues) {
     Box(
         modifier = Modifier.fillMaxSize().padding(contentPadding).padding(32.dp),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "Nessuna iscrizione",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
+            Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.size(8.dp))
             Text(
-                "Vai su Scopri per cercare nel catalogo o incollare l'URL di un sito.",
+                emptyText,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
         }
     }

@@ -23,6 +23,10 @@ reader, OPML) is ported one-to-one.
   paths `/feed`, `/rss`, `/atom.xml`, …).
 - **Home** — articles from every subscription, newest first, with a per-source
   filter.
+- **Favorites & Read later** — save any article to two on-device collections via
+  the heart / bookmark buttons on each card (and in the reader). Saved articles
+  keep their full content, so they stay readable even after the feed cache
+  evicts them.
 - **Reader** — tapping an article opens an in-app reader rendered in a WebView
   with **JavaScript disabled**. It shows the feed content immediately; the
   **"Leggi articolo intero"** button fetches the original page and extracts the

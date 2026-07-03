@@ -1,8 +1,10 @@
 package dev.frontek.feeds.data
 
 import android.content.Context
+import dev.frontek.feeds.model.Article
 import dev.frontek.feeds.model.CachedFeed
 import dev.frontek.feeds.model.FeedItem
+import dev.frontek.feeds.model.SavedArticle
 import dev.frontek.feeds.model.Subscription
 import org.json.JSONArray
 import org.json.JSONObject
@@ -16,6 +18,7 @@ class Store(context: Context) {
 
     private val subsFile = File(context.filesDir, "subs.json")
     private val cacheFile = File(context.filesDir, "cache.json")
+    private val savedFile = File(context.filesDir, "saved.json")
 
     // ---- subscriptions ----
 
@@ -101,6 +104,57 @@ class Store(context: Context) {
         write(cacheFile, root.toString())
     }
 
+    // ---- saved articles (favorites / read later) ----
+
+    fun loadSaved(): MutableList<SavedArticle> {
+        val text = readOrNull(savedFile) ?: return mutableListOf()
+        return try {
+            val arr = JSONArray(text)
+            (0 until arr.length()).mapNotNull { i ->
+                val o = arr.optJSONObject(i) ?: return@mapNotNull null
+                SavedArticle(
+                    article = Article(
+                        title = o.optString("title"),
+                        link = o.optString("link"),
+                        date = o.optLong("date"),
+                        summary = o.optString("summary"),
+                        content = o.optString("content"),
+                        id = o.optString("id"),
+                        source = o.optString("source"),
+                        site = o.optString("site").takeIf { it.isNotBlank() },
+                    ),
+                    favorite = o.optBoolean("favorite"),
+                    readLater = o.optBoolean("readLater"),
+                    savedAt = o.optLong("savedAt"),
+                )
+            }.toMutableList()
+        } catch (e: Exception) {
+            mutableListOf()
+        }
+    }
+
+    fun saveSaved(saved: List<SavedArticle>) {
+        val arr = JSONArray()
+        saved.forEach { s ->
+            val a = s.article
+            arr.put(
+                JSONObject()
+                    .put("title", a.title)
+                    .put("link", a.link)
+                    .put("date", a.date)
+                    .put("summary", a.summary)
+                    .put("content", a.content)
+                    .put("id", a.id)
+                    .put("source", a.source)
+                    .put("site", a.site ?: "")
+                    .put("favorite", s.favorite)
+                    .put("readLater", s.readLater)
+                    .put("savedAt", s.savedAt),
+            )
+        }
+        write(savedFile, arr.toString())
+    }
+
     fun clearCache() {
         cacheFile.delete()
     }
@@ -108,6 +162,7 @@ class Store(context: Context) {
     fun clearAll() {
         subsFile.delete()
         cacheFile.delete()
+        savedFile.delete()
     }
 
     private fun readOrNull(file: File): String? =

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -37,7 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 
-private enum class Tab { Home, Discover }
+private enum class Tab { Home, Favorites, ReadLater, Discover }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,6 +87,18 @@ fun AppRoot(vm: AppViewModel) {
                         label = { Text("Home") },
                     )
                     NavigationBarItem(
+                        selected = tab == Tab.Favorites,
+                        onClick = { tab = Tab.Favorites },
+                        icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                        label = { Text("Preferiti") },
+                    )
+                    NavigationBarItem(
+                        selected = tab == Tab.ReadLater,
+                        onClick = { tab = Tab.ReadLater },
+                        icon = { Icon(Icons.Filled.Bookmark, contentDescription = null) },
+                        label = { Text("Leggi dopo") },
+                    )
+                    NavigationBarItem(
                         selected = tab == Tab.Discover,
                         onClick = { tab = Tab.Discover },
                         icon = { Icon(Icons.Filled.Search, contentDescription = null) },
@@ -96,6 +110,22 @@ fun AppRoot(vm: AppViewModel) {
             Box(Modifier.fillMaxSize()) {
                 when (tab) {
                     Tab.Home -> HomeScreen(vm, padding) { reader = it }
+                    Tab.Favorites -> SavedScreen(
+                        vm = vm,
+                        items = vm.favorites,
+                        title = "Preferiti",
+                        emptyText = "Tocca il cuore su un articolo per salvarlo qui.",
+                        contentPadding = padding,
+                        onOpenArticle = { reader = it },
+                    )
+                    Tab.ReadLater -> SavedScreen(
+                        vm = vm,
+                        items = vm.readLaterItems,
+                        title = "Leggi più tardi",
+                        emptyText = "Tocca il segnalibro su un articolo per leggerlo più tardi.",
+                        contentPadding = padding,
+                        onOpenArticle = { reader = it },
+                    )
                     Tab.Discover -> DiscoverScreen(vm, padding)
                 }
                 if (vm.refreshing) {
@@ -114,7 +144,16 @@ fun AppRoot(vm: AppViewModel) {
             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
         ) {
-            reader?.let { ReaderScreen(it) { reader = null } }
+            reader?.let { article ->
+                ReaderScreen(
+                    article = article,
+                    isFavorite = vm.isFavorite(article),
+                    isReadLater = vm.isReadLater(article),
+                    onToggleFavorite = { vm.toggleFavorite(article) },
+                    onToggleReadLater = { vm.toggleReadLater(article) },
+                    onClose = { reader = null },
+                )
+            }
         }
     }
 

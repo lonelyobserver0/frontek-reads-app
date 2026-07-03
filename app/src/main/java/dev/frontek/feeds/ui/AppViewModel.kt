@@ -18,6 +18,7 @@ import dev.frontek.feeds.model.Article
 import dev.frontek.feeds.model.CachedFeed
 import dev.frontek.feeds.model.CatalogEntry
 import dev.frontek.feeds.model.FeedItem
+import dev.frontek.feeds.model.SavedArticle
 import dev.frontek.feeds.model.Subscription
 import dev.frontek.feeds.net.Http
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +52,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var toast by mutableStateOf<String?>(null)
         private set
+    var saved by mutableStateOf<List<SavedArticle>>(store.loadSaved())
+        private set
 
     init {
         catalog = CatalogRepository.load(app)
@@ -66,6 +69,61 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         get() = activeSource?.let { src -> homeItems.filter { it.source == src } } ?: homeItems
 
     fun isSubscribed(feedUrl: String): Boolean = subscriptions.any { it.feed == feedUrl }
+
+    // ---- saved collections (favorites / read later) ----
+
+    private fun keyOf(a: Article): String = a.id.ifBlank { a.link }
+
+    val favorites: List<Article>
+        get() = saved.filter { it.favorite }.sortedByDescending { it.savedAt }.map { it.article }
+
+    val readLaterItems: List<Article>
+        get() = saved.filter { it.readLater }.sortedByDescending { it.savedAt }.map { it.article }
+
+    fun isFavorite(a: Article): Boolean {
+        val key = keyOf(a)
+        return saved.any { keyOf(it.article) == key && it.favorite }
+    }
+
+    fun isReadLater(a: Article): Boolean {
+        val key = keyOf(a)
+        return saved.any { keyOf(it.article) == key && it.readLater }
+    }
+
+    fun toggleFavorite(a: Article) {
+        updateSaved(a, toggleFavorite = true)
+        notify(if (isFavorite(a)) "Aggiunto ai preferiti." else "Rimosso dai preferiti.")
+    }
+
+    fun toggleReadLater(a: Article) {
+        updateSaved(a, toggleFavorite = false)
+        notify(if (isReadLater(a)) "Salvato in “Leggi più tardi”." else "Rimosso da “Leggi più tardi”.")
+    }
+
+    private fun updateSaved(a: Article, toggleFavorite: Boolean) {
+        val key = keyOf(a)
+        val existing = saved.find { keyOf(it.article) == key }
+        saved = if (existing == null) {
+            saved + SavedArticle(
+                article = a,
+                favorite = toggleFavorite,
+                readLater = !toggleFavorite,
+                savedAt = System.currentTimeMillis(),
+            )
+        } else {
+            val updated = if (toggleFavorite) {
+                existing.copy(favorite = !existing.favorite)
+            } else {
+                existing.copy(readLater = !existing.readLater)
+            }
+            if (!updated.favorite && !updated.readLater) {
+                saved - existing
+            } else {
+                saved.map { if (keyOf(it.article) == key) updated else it }
+            }
+        }
+        store.saveSaved(saved)
+    }
 
     // ---- subscriptions ----
 
@@ -258,6 +316,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         cache.clear()
         homeItems = emptyList()
         activeSource = null
+        saved = emptyList()
         store.clearAll()
         notify("Tutti i dati eliminati.")
     }
