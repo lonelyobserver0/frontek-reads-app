@@ -20,6 +20,7 @@ class Store(context: Context) {
     private val cacheFile = File(context.filesDir, "cache.json")
     private val savedFile = File(context.filesDir, "saved.json")
     private val readFile = File(context.filesDir, "read.json")
+    private val seenFile = File(context.filesDir, "seen.json")
     private val settingsFile = File(context.filesDir, "settings.json")
 
     // ---- subscriptions ----
@@ -181,17 +182,52 @@ class Store(context: Context) {
         write(readFile, arr.toString())
     }
 
-    // ---- UI preferences ----
+    // ---- seen articles (baseline for background new-article detection) ----
 
-    fun loadFontScale(): Float = try {
-        val text = readOrNull(settingsFile) ?: return 1.0f
-        JSONObject(text).optDouble("fontScale", 1.0).toFloat()
-    } catch (e: Exception) {
-        1.0f
+    fun seenFileExists(): Boolean = seenFile.exists()
+
+    fun loadSeen(): MutableSet<String> {
+        val text = readOrNull(seenFile) ?: return mutableSetOf()
+        return try {
+            val arr = JSONArray(text)
+            (0 until arr.length()).mapNotNull { i ->
+                arr.optString(i).takeIf { it.isNotBlank() }
+            }.toMutableSet()
+        } catch (e: Exception) {
+            mutableSetOf()
+        }
     }
 
+    fun saveSeen(keys: Set<String>) {
+        val arr = JSONArray()
+        keys.forEach { arr.put(it) }
+        write(seenFile, arr.toString())
+    }
+
+    // ---- UI preferences / settings ----
+
+    private fun readSettings(): JSONObject = try {
+        readOrNull(settingsFile)?.let { JSONObject(it) } ?: JSONObject()
+    } catch (e: Exception) {
+        JSONObject()
+    }
+
+    fun loadFontScale(): Float = readSettings().optDouble("fontScale", 1.0).toFloat()
+
     fun saveFontScale(scale: Float) {
-        write(settingsFile, JSONObject().put("fontScale", scale.toDouble()).toString())
+        write(settingsFile, readSettings().put("fontScale", scale.toDouble()).toString())
+    }
+
+    fun loadUnreadOnly(): Boolean = readSettings().optBoolean("unreadOnly", false)
+
+    fun saveUnreadOnly(enabled: Boolean) {
+        write(settingsFile, readSettings().put("unreadOnly", enabled).toString())
+    }
+
+    fun loadNotificationsEnabled(): Boolean = readSettings().optBoolean("notifications", false)
+
+    fun saveNotificationsEnabled(enabled: Boolean) {
+        write(settingsFile, readSettings().put("notifications", enabled).toString())
     }
 
     fun clearCache() {
@@ -203,6 +239,7 @@ class Store(context: Context) {
         cacheFile.delete()
         savedFile.delete()
         readFile.delete()
+        seenFile.delete()
     }
 
     private fun readOrNull(file: File): String? =

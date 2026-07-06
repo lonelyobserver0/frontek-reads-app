@@ -26,6 +26,7 @@ import dev.frontek.feeds.model.FeedResult
 import dev.frontek.feeds.model.SavedArticle
 import dev.frontek.feeds.model.Subscription
 import dev.frontek.feeds.net.Http
+import dev.frontek.feeds.work.Notifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -65,6 +66,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var readKeys by mutableStateOf<Set<String>>(store.loadRead())
         private set
+    var unreadOnly by mutableStateOf(store.loadUnreadOnly())
+        private set
+    var notificationsEnabled by mutableStateOf(store.loadNotificationsEnabled())
+        private set
     var fontScale by mutableStateOf(store.loadFontScale())
         private set
     var searchResults by mutableStateOf<List<FeedResult>>(emptyList())
@@ -78,6 +83,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     init {
         catalog = CatalogRepository.load(app)
         refreshAll(force = false)
+        if (notificationsEnabled) {
+            Notifications.ensureChannel(app)
+            Notifications.schedule(app)
+        }
     }
 
     fun consumeToast() { toast = null }
@@ -104,7 +113,37 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     fun resetFont() = applyFontScale(1.0f)
 
     val filteredItems: List<Article>
-        get() = activeSource?.let { src -> homeItems.filter { it.source == src } } ?: homeItems
+        get() {
+            val bySource = activeSource?.let { src -> homeItems.filter { it.source == src } } ?: homeItems
+            return if (unreadOnly) bySource.filterNot { isRead(it) } else bySource
+        }
+
+    fun updateUnreadOnly(enabled: Boolean) {
+        unreadOnly = enabled
+        store.saveUnreadOnly(enabled)
+    }
+
+    // ---- background notifications ----
+
+    fun updateNotifications(enabled: Boolean) {
+        notificationsEnabled = enabled
+        store.saveNotificationsEnabled(enabled)
+        val ctx = getApplication<Application>()
+        if (enabled) {
+            Notifications.ensureChannel(ctx)
+            seedSeenBaseline()
+            Notifications.schedule(ctx)
+        } else {
+            Notifications.cancel(ctx)
+        }
+    }
+
+    /** Mark everything currently visible as "seen" so background runs only alert on new items. */
+    private fun seedSeenBaseline() {
+        val keys = homeItems.map { keyOf(it) }.filter { it.isNotBlank() }
+        if (keys.isEmpty()) return
+        store.saveSeen(store.loadSeen() + keys)
+    }
 
     fun isSubscribed(feedUrl: String): Boolean = subscriptions.any { it.feed == feedUrl }
 
@@ -154,6 +193,21 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         val key = keyOf(a)
         if (key.isBlank() || key in readKeys) return
         readKeys = readKeys + key
+        store.saveRead(readKeys)
+    }
+
+    fun markAllRead() {
+        val keys = homeItems.map { keyOf(it) }.filter { it.isNotBlank() }.toSet()
+        if (keys.isEmpty() || keys.all { it in readKeys }) return
+        readKeys = readKeys + keys
+        store.saveRead(readKeys)
+    }
+
+    /** Flip an article's read state (used by the swipe gesture). */
+    fun toggleRead(a: Article) {
+        val key = keyOf(a)
+        if (key.isBlank()) return
+        readKeys = if (key in readKeys) readKeys - key else readKeys + key
         store.saveRead(readKeys)
     }
 
@@ -290,6 +344,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             homeItems = collected
             store.saveCache(cache)
             store.saveSubs(subscriptions)
+            if (notificationsEnabled) {
+                val keys = collected.map { keyOf(it) }.filter { it.isNotBlank() }
+                if (keys.isNotEmpty()) store.saveSeen(store.loadSeen() + keys)
+            }
 
             val failures = results.mapNotNull { it.failure }
             statusMessage = if (failures.isNotEmpty()) {

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -162,6 +164,9 @@ fun ReaderScreen(
                                 tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current,
                             )
                         }
+                        IconButton(onClick = { shareArticle(context, article) }) {
+                            Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.action_share))
+                        }
                         if (article.link.isNotBlank()) {
                             IconButton(onClick = { openExternal(context, article.link) }) {
                                 Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.reader_open_original))
@@ -186,6 +191,7 @@ fun ReaderScreen(
                 ArticleWebView(
                     body = body,
                     baseUrl = article.link.ifBlank { "https://frontek.dev" },
+                    dark = isSystemInDarkTheme(),
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 )
                 if (article.link.isNotBlank() && !fullLoaded) {
@@ -205,11 +211,12 @@ fun ReaderScreen(
 }
 
 @Composable
-private fun ArticleWebView(body: String, baseUrl: String, modifier: Modifier) {
-    val html = remember(body) { buildPage(body) }
+private fun ArticleWebView(body: String, baseUrl: String, dark: Boolean, modifier: Modifier) {
+    val html = remember(body, dark) { buildPage(body, dark) }
     // Match the reader text to the app-wide font-size preference (density.fontScale
     // already includes the user's scale, applied in MainActivity).
     val textZoom = (LocalDensity.current.fontScale * 100).roundToInt()
+    val pageBg = if (dark) android.graphics.Color.parseColor("#121716") else android.graphics.Color.parseColor("#f8f6ef")
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
@@ -236,36 +243,64 @@ private fun ArticleWebView(body: String, baseUrl: String, modifier: Modifier) {
             }
         },
         update = { web ->
+            web.setBackgroundColor(pageBg)
             web.settings.textZoom = textZoom
             web.loadDataWithBaseURL(baseUrl, html, "text/html", "utf-8", null)
         },
     )
 }
 
-private fun buildPage(body: String): String = """
+private fun buildPage(body: String, dark: Boolean): String {
+    val c = if (dark) {
+        PageColors(
+            scheme = "dark", bg = "#121716", text = "#dfe6e2", heading = "#cfe6df",
+            link = "#4db6a5", surface = "#1e2725", caption = "#9aa9a3",
+            quote = "#c3d0cb", border = "#2c3a37",
+        )
+    } else {
+        PageColors(
+            scheme = "light", bg = "#f8f6ef", text = "#21333b", heading = "#264653",
+            link = "#2a9d8f", surface = "#eef0ea", caption = "#5a6b73",
+            quote = "#41545c", border = "#e4e0d4",
+        )
+    }
+    return """
 <!doctype html>
 <html><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  html{color-scheme: light;}
+  html{color-scheme: ${c.scheme};}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-       line-height:1.62;color:#21333b;background:#f8f6ef;margin:0;padding:18px;font-size:17px;
+       line-height:1.62;color:${c.text};background:${c.bg};margin:0;padding:18px;font-size:17px;
        overflow-wrap:break-word;word-wrap:break-word;}
   img,picture,figure,video{max-width:100%;height:auto;border-radius:10px;margin:8px 0;}
   figure{margin-inline:0;}
-  figcaption{font-size:.85em;color:#5a6b73;text-align:center;}
-  a{color:#2a9d8f;text-decoration:none;}
-  h1,h2,h3,h4{line-height:1.25;color:#264653;}
-  pre{background:#eef0ea;border-radius:8px;padding:12px;overflow:auto;}
-  code{background:#eef0ea;border-radius:4px;padding:1px 4px;}
+  figcaption{font-size:.85em;color:${c.caption};text-align:center;}
+  a{color:${c.link};text-decoration:none;}
+  h1,h2,h3,h4{line-height:1.25;color:${c.heading};}
+  pre{background:${c.surface};border-radius:8px;padding:12px;overflow:auto;}
+  code{background:${c.surface};border-radius:4px;padding:1px 4px;}
   pre code{background:none;padding:0;}
-  blockquote{border-left:3px solid #2a9d8f;margin:12px 0;padding:2px 0 2px 14px;color:#41545c;}
+  blockquote{border-left:3px solid ${c.link};margin:12px 0;padding:2px 0 2px 14px;color:${c.quote};}
   table{border-collapse:collapse;max-width:100%;display:block;overflow:auto;}
-  td,th{border:1px solid #e4e0d4;padding:6px 10px;}
+  td,th{border:1px solid ${c.border};padding:6px 10px;}
 </style></head>
 <body>$body</body></html>
 """.trimIndent()
+}
+
+private data class PageColors(
+    val scheme: String,
+    val bg: String,
+    val text: String,
+    val heading: String,
+    val link: String,
+    val surface: String,
+    val caption: String,
+    val quote: String,
+    val border: String,
+)
 
 private fun openExternal(context: android.content.Context, url: String) {
     try {

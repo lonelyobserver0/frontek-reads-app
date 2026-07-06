@@ -1,9 +1,11 @@
 package dev.frontek.feeds.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,12 +14,32 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.MarkEmailRead
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import dev.frontek.feeds.R
 import dev.frontek.feeds.model.Article
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     vm: AppViewModel,
@@ -32,45 +55,167 @@ fun HomeScreen(
     onOpenArticle: (Article) -> Unit,
 ) {
     val subs = vm.subscriptions
-    val items = vm.filteredItems
 
     if (subs.isEmpty()) {
         EmptyHome(contentPadding)
         return
     }
 
-    LazyColumn(
+    var query by remember { mutableStateOf("") }
+    val base = vm.filteredItems
+    val items = if (query.isBlank()) {
+        base
+    } else {
+        val q = query.trim().lowercase()
+        base.filter {
+            it.title.lowercase().contains(q) ||
+                it.summary.lowercase().contains(q) ||
+                it.source.lowercase().contains(q)
+        }
+    }
+
+    PullToRefreshBox(
+        isRefreshing = vm.refreshing,
+        onRefresh = { vm.refreshAll(force = true) },
         modifier = Modifier.fillMaxSize(),
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        item {
-            Text(
-                text = stringResource(
-                    R.string.home_summary,
-                    pluralStringResource(R.plurals.subscriptions_count, subs.size, subs.size),
-                    pluralStringResource(R.plurals.articles_count, vm.homeItems.size, vm.homeItems.size),
-                ),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = contentPadding,
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            item {
+                Text(
+                    text = stringResource(
+                        R.string.home_summary,
+                        pluralStringResource(R.plurals.subscriptions_count, subs.size, subs.size),
+                        pluralStringResource(R.plurals.articles_count, vm.homeItems.size, vm.homeItems.size),
+                    ),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
+            item {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    placeholder = { Text(stringResource(R.string.home_search_placeholder)) },
+                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                    trailingIcon = {
+                        if (query.isNotBlank()) {
+                            IconButton(onClick = { query = "" }) {
+                                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.home_search_clear))
+                            }
+                        }
+                    },
+                    singleLine = true,
+                )
+            }
+            item {
+                ReadControls(vm)
+            }
+            if (subs.size >= 2) {
+                item { SourceFilters(vm) }
+            }
+            items(items, key = { it.id + it.source }) { article ->
+                SwipeableArticleCard(
+                    article = article,
+                    isFavorite = vm.isFavorite(article),
+                    isReadLater = vm.isReadLater(article),
+                    isRead = vm.isRead(article),
+                    onOpen = onOpenArticle,
+                    onToggleRead = { vm.toggleRead(it) },
+                    onToggleFavorite = { vm.toggleFavorite(it) },
+                    onToggleReadLater = { vm.toggleReadLater(it) },
+                )
+            }
+            item { Spacer(Modifier.size(12.dp)) }
         }
-        if (subs.size >= 2) {
-            item { SourceFilters(vm) }
+    }
+}
+
+@Composable
+private fun ReadControls(vm: AppViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        FilterChip(
+            selected = vm.unreadOnly,
+            onClick = { vm.updateUnreadOnly(!vm.unreadOnly) },
+            label = { Text(stringResource(R.string.home_unread_only)) },
+            leadingIcon = if (vm.unreadOnly) {
+                { Icon(Icons.Filled.MarkEmailRead, contentDescription = null, modifier = Modifier.size(18.dp)) }
+            } else {
+                null
+            },
+        )
+        Spacer(Modifier.weight(1f))
+        TextButton(onClick = { vm.markAllRead() }) {
+            Icon(Icons.Filled.DoneAll, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.size(6.dp))
+            Text(stringResource(R.string.home_mark_all_read))
         }
-        items(items, key = { it.id + it.source }) { article ->
-            ArticleCard(
-                article = article,
-                isFavorite = vm.isFavorite(article),
-                isReadLater = vm.isReadLater(article),
-                isRead = vm.isRead(article),
-                onOpen = onOpenArticle,
-                onToggleFavorite = { vm.toggleFavorite(it) },
-                onToggleReadLater = { vm.toggleReadLater(it) },
-            )
-        }
-        item { Spacer(Modifier.size(12.dp)) }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableArticleCard(
+    article: Article,
+    isFavorite: Boolean,
+    isReadLater: Boolean,
+    isRead: Boolean,
+    onOpen: (Article) -> Unit,
+    onToggleRead: (Article) -> Unit,
+    onToggleFavorite: (Article) -> Unit,
+    onToggleReadLater: (Article) -> Unit,
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            if (value != SwipeToDismissBoxValue.Settled) {
+                onToggleRead(article)
+            }
+            // Never actually dismiss the item — just use the gesture to toggle read.
+            false
+        },
+    )
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                    Alignment.CenterEnd
+                } else {
+                    Alignment.CenterStart
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.MarkEmailRead,
+                    contentDescription = stringResource(if (isRead) R.string.mark_unread else R.string.mark_read),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
+            }
+        },
+    ) {
+        ArticleCard(
+            article = article,
+            isFavorite = isFavorite,
+            isReadLater = isReadLater,
+            isRead = isRead,
+            onOpen = onOpen,
+            onToggleFavorite = onToggleFavorite,
+            onToggleReadLater = onToggleReadLater,
+        )
     }
 }
 

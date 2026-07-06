@@ -74,6 +74,23 @@
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
 
+    <!-- Home extras -->
+    <string name="home_unread_only">Unread only</string>
+    <string name="home_mark_all_read">Mark all read</string>
+    <string name="home_search_placeholder">Search your articles…</string>
+    <string name="home_search_clear">Clear search</string>
+    <string name="mark_read">Mark as read</string>
+    <string name="mark_unread">Mark as unread</string>
+    <string name="action_share">Share</string>
+
+    <!-- Notifications -->
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_label">Notify me about new articles</string>
+    <string name="settings_notifications_desc">Checks your feeds in the background about every 15 minutes.</string>
+    <string name="notif_channel_name">New articles</string>
+    <string name="notif_channel_desc">Alerts you when your subscriptions publish new articles.</string>
+    <string name="notif_permission_denied">Enable notifications for Frontek Reads in system settings.</string>
+
     <!-- Toasts -->
     <string name="toast_already_subscribed_named">Already subscribed to “%1$s”.</string>
     <string name="toast_subscribed_named">Subscribed to “%1$s”.</string>
@@ -109,5 +126,9 @@
     <plurals name="feeds_imported">
         <item quantity="one">Imported %d feed.</item>
         <item quantity="other">Imported %d feeds.</item>
+    </plurals>
+    <plurals name="notif_new_articles">
+        <item quantity="one">%d new article</item>
+        <item quantity="other">%d new articles</item>
     </plurals>
 </resources>
