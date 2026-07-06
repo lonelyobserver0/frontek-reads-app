@@ -212,10 +212,21 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         store.saveRead(readKeys)
     }
 
+    /** True when every article on the home is already read (drives the toggle button). */
+    val allHomeRead: Boolean
+        get() = homeItems.isNotEmpty() && homeItems.all { keyOf(it) in readKeys }
+
     fun markAllRead() {
         val keys = homeItems.map { keyOf(it) }.filter { it.isNotBlank() }.toSet()
         if (keys.isEmpty() || keys.all { it in readKeys }) return
         readKeys = readKeys + keys
+        store.saveRead(readKeys)
+    }
+
+    fun markAllUnread() {
+        val keys = homeItems.map { keyOf(it) }.filter { it.isNotBlank() }.toSet()
+        if (keys.isEmpty() || keys.none { it in readKeys }) return
+        readKeys = readKeys - keys
         store.saveRead(readKeys)
     }
 

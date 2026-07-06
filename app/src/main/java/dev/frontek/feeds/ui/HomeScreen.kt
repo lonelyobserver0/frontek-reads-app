@@ -1,6 +1,5 @@
 package dev.frontek.feeds.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.MarkEmailRead
+import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -26,12 +25,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -120,7 +115,7 @@ fun HomeScreen(
                 item { SourceFilters(vm) }
             }
             items(items, key = { it.id + it.source }) { article ->
-                SwipeableArticleCard(
+                ArticleCard(
                     article = article,
                     isFavorite = vm.isFavorite(article),
                     isReadLater = vm.isReadLater(article),
@@ -154,68 +149,16 @@ private fun ReadControls(vm: AppViewModel) {
             },
         )
         Spacer(Modifier.weight(1f))
-        TextButton(onClick = { vm.markAllRead() }) {
-            Icon(Icons.Filled.DoneAll, contentDescription = null, modifier = Modifier.size(18.dp))
+        val allRead = vm.allHomeRead
+        TextButton(onClick = { if (allRead) vm.markAllUnread() else vm.markAllRead() }) {
+            Icon(
+                imageVector = if (allRead) Icons.Filled.MarkEmailUnread else Icons.Filled.DoneAll,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+            )
             Spacer(Modifier.size(6.dp))
-            Text(stringResource(R.string.home_mark_all_read))
+            Text(stringResource(if (allRead) R.string.home_mark_all_unread else R.string.home_mark_all_read))
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SwipeableArticleCard(
-    article: Article,
-    isFavorite: Boolean,
-    isReadLater: Boolean,
-    isRead: Boolean,
-    onOpen: (Article) -> Unit,
-    onToggleRead: (Article) -> Unit,
-    onToggleFavorite: (Article) -> Unit,
-    onToggleReadLater: (Article) -> Unit,
-) {
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value != SwipeToDismissBoxValue.Settled) {
-                onToggleRead(article)
-            }
-            // Never actually dismiss the item — just use the gesture to toggle read.
-            false
-        },
-    )
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                    Alignment.CenterEnd
-                } else {
-                    Alignment.CenterStart
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.MarkEmailRead,
-                    contentDescription = stringResource(if (isRead) R.string.mark_unread else R.string.mark_read),
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-            }
-        },
-    ) {
-        ArticleCard(
-            article = article,
-            isFavorite = isFavorite,
-            isReadLater = isReadLater,
-            isRead = isRead,
-            onOpen = onOpen,
-            onToggleFavorite = onToggleFavorite,
-            onToggleReadLater = onToggleReadLater,
-        )
     }
 }
 

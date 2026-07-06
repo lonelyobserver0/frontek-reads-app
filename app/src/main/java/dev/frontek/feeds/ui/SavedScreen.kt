@@ -56,6 +56,7 @@ fun SavedScreen(
                 isReadLater = vm.isReadLater(article),
                 isRead = vm.isRead(article),
                 onOpen = onOpenArticle,
+                onToggleRead = { vm.toggleRead(it) },
                 onToggleFavorite = { vm.toggleFavorite(it) },
                 onToggleReadLater = { vm.toggleReadLater(it) },
             )

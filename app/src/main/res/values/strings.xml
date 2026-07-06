@@ -83,6 +83,7 @@
     <!-- Home extras -->
     <string name="home_unread_only">Unread only</string>
     <string name="home_mark_all_read">Mark all read</string>
+    <string name="home_mark_all_unread">Mark all unread</string>
     <string name="home_search_placeholder">Search your articles…</string>
     <string name="home_search_clear">Clear search</string>
     <string name="mark_read">Mark as read</string>

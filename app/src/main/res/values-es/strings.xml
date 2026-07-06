@@ -83,6 +83,7 @@
     <!-- Home extras -->
     <string name="home_unread_only">Solo no leídos</string>
     <string name="home_mark_all_read">Marcar todo leído</string>
+    <string name="home_mark_all_unread">Marcar todo no leído</string>
     <string name="home_search_placeholder">Busca en tus artículos…</string>
     <string name="home_search_clear">Borrar búsqueda</string>
     <string name="mark_read">Marcar como leído</string>

@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MarkEmailRead
+import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +48,7 @@ fun ArticleCard(
     isReadLater: Boolean,
     isRead: Boolean,
     onOpen: (Article) -> Unit,
+    onToggleRead: (Article) -> Unit,
     onToggleFavorite: (Article) -> Unit,
     onToggleReadLater: (Article) -> Unit,
 ) {
@@ -127,29 +130,38 @@ fun ArticleCard(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = { shareArticle(context, article) }) {
+                IconButton(onClick = { onToggleRead(article) }) {
                     Icon(
-                        imageVector = Icons.Filled.Share,
-                        contentDescription = stringResource(R.string.action_share),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        imageVector = if (isRead) Icons.Filled.MarkEmailRead else Icons.Filled.MarkEmailUnread,
+                        contentDescription = stringResource(if (isRead) R.string.mark_unread else R.string.mark_read),
+                        tint = if (isRead) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                IconButton(onClick = { onToggleReadLater(article) }) {
-                    Icon(
-                        imageVector = if (isReadLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                        contentDescription = stringResource(if (isReadLater) R.string.read_later_remove else R.string.read_later_add),
-                        tint = if (isReadLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                IconButton(onClick = { onToggleFavorite(article) }) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = stringResource(if (isFavorite) R.string.fav_remove else R.string.fav_add),
-                        tint = if (isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { shareArticle(context, article) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = stringResource(R.string.action_share),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    IconButton(onClick = { onToggleReadLater(article) }) {
+                        Icon(
+                            imageVector = if (isReadLater) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                            contentDescription = stringResource(if (isReadLater) R.string.read_later_remove else R.string.read_later_add),
+                            tint = if (isReadLater) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    IconButton(onClick = { onToggleFavorite(article) }) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = stringResource(if (isFavorite) R.string.fav_remove else R.string.fav_add),
+                            tint = if (isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
