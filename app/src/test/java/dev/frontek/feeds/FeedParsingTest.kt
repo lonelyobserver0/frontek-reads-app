@@ -130,6 +130,52 @@ class FeedParsingTest {
         assertTrue(clean.contains("https://site.com/rel"))
     }
 
+    @Test
+    fun sanitizePromotesLazyImages() {
+        val dirty = "<p>Hi</p><img src=\"data:image/gif;base64,R0lGOD\" " +
+            "data-src=\"https://cdn.example.com/real.jpg\" alt=\"x\">"
+        val clean = HtmlUtils.sanitize(dirty, "https://site.com/")
+        assertTrue(clean.contains("https://cdn.example.com/real.jpg"))
+        assertTrue(!clean.contains("data:image"))
+    }
+
+    @Test
+    fun sanitizePicksLargestFromSrcset() {
+        val dirty = "<img srcset=\"https://x.com/s.jpg 320w, https://x.com/l.jpg 1200w\">"
+        val clean = HtmlUtils.sanitize(dirty, "https://x.com/")
+        assertTrue(clean.contains("https://x.com/l.jpg"))
+    }
+
+    @Test
+    fun extractsFromJsonLdArticleBody() {
+        val body = "First paragraph with plenty of words to clear the length threshold. " +
+            "It keeps going so the extractor treats it as the real article body content here. " +
+            "The story continues across several sentences, describing the events in detail and " +
+            "adding enough prose that the JSON-LD body is clearly longer than the tiny DOM stub. " +
+            "Editors, sources and quotes all appear here, well past four hundred characters total, " +
+            "so the extractor confidently prefers this structured body over the page markup."
+        val html = """
+            <html><head>
+            <script type="application/ld+json">
+            {"@context":"https://schema.org","@type":"NewsArticle","headline":"T",
+             "articleBody":"$body"}
+            </script>
+            </head><body>
+            <div class="nav">menu junk here</div>
+            <article><p>tiny stub</p></article>
+            </body></html>
+        """.trimIndent()
+        val (extracted, len) = HtmlUtils.extractArticle(html, "https://news.example.com/x")
+        assertTrue(len > 100)
+        assertTrue(extracted.contains("First paragraph with plenty of words"))
+    }
+
+    @Test
+    fun findsAmpUrl() {
+        val html = "<html><head><link rel=\"amphtml\" href=\"/amp/story\"></head><body></body></html>"
+        assertEquals("https://site.com/amp/story", HtmlUtils.findAmpUrl(html, "https://site.com/story"))
+    }
+
     private val catalog = listOf(
         CatalogEntry("HDblog", "https://www.hdblog.it", "https://www.hdblog.it/feed/", "Tech"),
         CatalogEntry("The Verge", "https://www.theverge.com", "https://www.theverge.com/rss/index.xml", "Tech"),

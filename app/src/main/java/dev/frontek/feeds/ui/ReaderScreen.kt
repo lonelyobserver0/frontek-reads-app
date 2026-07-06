@@ -97,13 +97,30 @@ fun ReaderScreen(
         if (auto) note = null
         scope.launch {
             try {
-                val (html, chars) = withContext(Dispatchers.IO) {
+                val (html, chars, srcUrl) = withContext(Dispatchers.IO) {
                     val page = Http.fetchText(article.link)
-                    val res = HtmlUtils.extractArticle(page, article.link)
-                    res
+                    var extracted = HtmlUtils.extractArticle(page, article.link)
+                    var usedUrl = article.link
+                    // If the main page extracts poorly, try its AMP version (usually cleaner).
+                    if (extracted.second < 600) {
+                        val amp = HtmlUtils.findAmpUrl(page, article.link)
+                        if (!amp.isNullOrBlank() && amp != article.link) {
+                            try {
+                                val ampPage = Http.fetchText(amp)
+                                val ampExtracted = HtmlUtils.extractArticle(ampPage, amp)
+                                if (ampExtracted.second > extracted.second) {
+                                    extracted = ampExtracted
+                                    usedUrl = amp
+                                }
+                            } catch (e: Exception) {
+                                // AMP fetch failed; keep the original extraction.
+                            }
+                        }
+                    }
+                    Triple(extracted.first, extracted.second, usedUrl)
                 }
-                if (chars < 400) throw IllegalStateException("too short")
-                body = HtmlUtils.sanitize(html, article.link)
+                if (chars < 200) throw IllegalStateException("too short")
+                body = HtmlUtils.sanitize(html, srcUrl)
                 note = null
                 fullLoaded = true
             } catch (e: Exception) {
