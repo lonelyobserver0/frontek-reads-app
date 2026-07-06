@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.frontek.feeds.R
+import dev.frontek.feeds.ui.theme.ThemeMode
+import dev.frontek.feeds.ui.theme.dynamicColorAvailable
 import dev.frontek.feeds.work.Notifications
 
 @Composable
@@ -134,6 +136,45 @@ fun SettingsDialog(vm: AppViewModel, onDismiss: () -> Unit) {
                 LanguageOption(R.string.lang_french, language == LocaleManager.FRENCH) {
                     language = LocaleManager.FRENCH
                     LocaleManager.set(LocaleManager.FRENCH)
+                }
+
+                Spacer(Modifier.size(16.dp))
+                Text(
+                    stringResource(R.string.settings_theme),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+                LanguageOption(R.string.theme_system, vm.themeMode == ThemeMode.SYSTEM) {
+                    vm.updateThemeMode(ThemeMode.SYSTEM)
+                }
+                LanguageOption(R.string.theme_light, vm.themeMode == ThemeMode.LIGHT) {
+                    vm.updateThemeMode(ThemeMode.LIGHT)
+                }
+                LanguageOption(R.string.theme_dark, vm.themeMode == ThemeMode.DARK) {
+                    vm.updateThemeMode(ThemeMode.DARK)
+                }
+                if (dynamicColorAvailable) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.settings_dynamic_color),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                stringResource(R.string.settings_dynamic_color_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Spacer(Modifier.size(8.dp))
+                        Switch(
+                            checked = vm.dynamicColor,
+                            onCheckedChange = { vm.updateDynamicColor(it) },
+                        )
+                    }
                 }
 
                 Spacer(Modifier.size(16.dp))

@@ -1,12 +1,32 @@
 package dev.frontek.feeds.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+
+/** Persisted theme preference values. */
+object ThemeMode {
+    const val SYSTEM = "system"
+    const val LIGHT = "light"
+    const val DARK = "dark"
+}
+
+/** True when Material You dynamic color is available on this device (Android 12+). */
+val dynamicColorAvailable: Boolean
+    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+/** Whether the app is currently rendering its dark theme (honors the user's override). */
+val LocalAppDarkTheme = staticCompositionLocalOf { false }
 
 // frontek reads brand palette
 val BrandTeal = Color(0xFF2A9D8F)
@@ -55,11 +75,22 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun FrontekReadsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
-        typography = Typography(),
-        content = content,
-    )
+    val colorScheme = when {
+        dynamicColor && dynamicColorAvailable -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> DarkColors
+        else -> LightColors
+    }
+    CompositionLocalProvider(LocalAppDarkTheme provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography(),
+            content = content,
+        )
+    }
 }

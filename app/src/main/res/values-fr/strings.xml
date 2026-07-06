@@ -60,6 +60,12 @@
     <string name="font_decrease">Réduire la taille du texte</string>
     <string name="font_increase">Augmenter la taille du texte</string>
     <string name="font_reset">Réinitialiser</string>
+    <string name="settings_theme">Thème</string>
+    <string name="theme_system">Par défaut du système</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="settings_dynamic_color">Couleurs Material You</string>
+    <string name="settings_dynamic_color_desc">Utilise les couleurs de ton fond d\'écran (Android 12+).</string>
     <string name="settings_language">Langue</string>
     <string name="lang_system">Par défaut du système</string>
     <string name="lang_italian">Italiano</string>

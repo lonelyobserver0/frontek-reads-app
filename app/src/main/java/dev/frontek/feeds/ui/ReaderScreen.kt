@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -53,6 +52,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import dev.frontek.feeds.R
 import dev.frontek.feeds.feed.HtmlUtils
 import dev.frontek.feeds.model.Article
+import dev.frontek.feeds.ui.theme.LocalAppDarkTheme
 import dev.frontek.feeds.net.Http
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
@@ -191,7 +191,7 @@ fun ReaderScreen(
                 ArticleWebView(
                     body = body,
                     baseUrl = article.link.ifBlank { "https://frontek.dev" },
-                    dark = isSystemInDarkTheme(),
+                    dark = LocalAppDarkTheme.current,
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                 )
                 if (article.link.isNotBlank() && !fullLoaded) {

@@ -230,6 +230,18 @@ class Store(context: Context) {
         write(settingsFile, readSettings().put("notifications", enabled).toString())
     }
 
+    fun loadThemeMode(): String = readSettings().optString("themeMode", "system")
+
+    fun saveThemeMode(mode: String) {
+        write(settingsFile, readSettings().put("themeMode", mode).toString())
+    }
+
+    fun loadDynamicColor(): Boolean = readSettings().optBoolean("dynamicColor", false)
+
+    fun saveDynamicColor(enabled: Boolean) {
+        write(settingsFile, readSettings().put("dynamicColor", enabled).toString())
+    }
+
     fun clearCache() {
         cacheFile.delete()
     }

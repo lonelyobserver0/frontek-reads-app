@@ -70,6 +70,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var notificationsEnabled by mutableStateOf(store.loadNotificationsEnabled())
         private set
+    var themeMode by mutableStateOf(store.loadThemeMode())
+        private set
+    var dynamicColor by mutableStateOf(store.loadDynamicColor())
+        private set
     var fontScale by mutableStateOf(store.loadFontScale())
         private set
     var searchResults by mutableStateOf<List<FeedResult>>(emptyList())
@@ -121,6 +125,18 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     fun updateUnreadOnly(enabled: Boolean) {
         unreadOnly = enabled
         store.saveUnreadOnly(enabled)
+    }
+
+    // ---- theme ----
+
+    fun updateThemeMode(mode: String) {
+        themeMode = mode
+        store.saveThemeMode(mode)
+    }
+
+    fun updateDynamicColor(enabled: Boolean) {
+        dynamicColor = enabled
+        store.saveDynamicColor(enabled)
     }
 
     // ---- background notifications ----
