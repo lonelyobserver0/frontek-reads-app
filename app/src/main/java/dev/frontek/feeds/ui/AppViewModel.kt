@@ -63,6 +63,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var saved by mutableStateOf<List<SavedArticle>>(store.loadSaved())
         private set
+    var readKeys by mutableStateOf<Set<String>>(store.loadRead())
+        private set
     var fontScale by mutableStateOf(store.loadFontScale())
         private set
     var searchResults by mutableStateOf<List<FeedResult>>(emptyList())
@@ -142,6 +144,18 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     // ---- saved collections (favorites / read later) ----
 
     private fun keyOf(a: Article): String = a.id.ifBlank { a.link }
+
+    // ---- read state ----
+
+    fun isRead(a: Article): Boolean = keyOf(a) in readKeys
+
+    /** Mark an article as read (when it is opened in the reader). */
+    fun markRead(a: Article) {
+        val key = keyOf(a)
+        if (key.isBlank() || key in readKeys) return
+        readKeys = readKeys + key
+        store.saveRead(readKeys)
+    }
 
     val favorites: List<Article>
         get() = saved.filter { it.favorite }.sortedByDescending { it.savedAt }.map { it.article }
@@ -394,6 +408,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         homeItems = emptyList()
         activeSource = null
         saved = emptyList()
+        readKeys = emptySet()
         store.clearAll()
         notify(str(R.string.toast_all_deleted))
     }

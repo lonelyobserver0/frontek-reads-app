@@ -64,6 +64,7 @@ fun HomeScreen(
                 article = article,
                 isFavorite = vm.isFavorite(article),
                 isReadLater = vm.isReadLater(article),
+                isRead = vm.isRead(article),
                 onOpen = onOpenArticle,
                 onToggleFavorite = { vm.toggleFavorite(it) },
                 onToggleReadLater = { vm.toggleReadLater(it) },

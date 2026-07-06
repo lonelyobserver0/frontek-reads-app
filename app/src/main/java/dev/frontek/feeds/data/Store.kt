@@ -19,6 +19,7 @@ class Store(context: Context) {
     private val subsFile = File(context.filesDir, "subs.json")
     private val cacheFile = File(context.filesDir, "cache.json")
     private val savedFile = File(context.filesDir, "saved.json")
+    private val readFile = File(context.filesDir, "read.json")
     private val settingsFile = File(context.filesDir, "settings.json")
 
     // ---- subscriptions ----
@@ -160,6 +161,26 @@ class Store(context: Context) {
         write(savedFile, arr.toString())
     }
 
+    // ---- read articles (keys only) ----
+
+    fun loadRead(): MutableSet<String> {
+        val text = readOrNull(readFile) ?: return mutableSetOf()
+        return try {
+            val arr = JSONArray(text)
+            (0 until arr.length()).mapNotNull { i ->
+                arr.optString(i).takeIf { it.isNotBlank() }
+            }.toMutableSet()
+        } catch (e: Exception) {
+            mutableSetOf()
+        }
+    }
+
+    fun saveRead(keys: Set<String>) {
+        val arr = JSONArray()
+        keys.forEach { arr.put(it) }
+        write(readFile, arr.toString())
+    }
+
     // ---- UI preferences ----
 
     fun loadFontScale(): Float = try {
@@ -181,6 +202,7 @@ class Store(context: Context) {
         subsFile.delete()
         cacheFile.delete()
         savedFile.delete()
+        readFile.delete()
     }
 
     private fun readOrNull(file: File): String? =

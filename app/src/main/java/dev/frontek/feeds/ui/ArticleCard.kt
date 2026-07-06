@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -42,28 +43,36 @@ fun ArticleCard(
     article: Article,
     isFavorite: Boolean,
     isReadLater: Boolean,
+    isRead: Boolean,
     onOpen: (Article) -> Unit,
     onToggleFavorite: (Article) -> Unit,
     onToggleReadLater: (Article) -> Unit,
 ) {
     val context = LocalContext.current
+    // Read articles are dimmed and lose the unread dot / bold title.
+    val contentAlpha = if (isRead) 0.55f else 1f
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clickable { onOpen(article) },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isRead) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            else MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isRead) 0.dp else 1.dp),
     ) {
         Column(modifier = Modifier.padding(start = 16.dp, end = 8.dp, top = 16.dp, bottom = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                )
-                Spacer(Modifier.size(6.dp))
+                if (!isRead) {
+                    Box(
+                        Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
+                    )
+                    Spacer(Modifier.size(6.dp))
+                }
                 Text(
                     article.source,
                     style = MaterialTheme.typography.labelMedium,
@@ -83,7 +92,7 @@ fun ArticleCard(
                 }
             }
             Spacer(Modifier.size(6.dp))
-            Row(verticalAlignment = Alignment.Top) {
+            Row(verticalAlignment = Alignment.Top, modifier = Modifier.alpha(contentAlpha)) {
                 if (!article.image.isNullOrBlank()) {
                     AsyncImage(
                         model = article.image,
@@ -100,7 +109,7 @@ fun ArticleCard(
                     Text(
                         article.title,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = if (isRead) FontWeight.Normal else FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     if (article.summary.isNotBlank()) {

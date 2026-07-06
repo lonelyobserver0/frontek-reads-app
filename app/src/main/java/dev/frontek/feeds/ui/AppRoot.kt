@@ -115,15 +115,19 @@ fun AppRoot(vm: AppViewModel) {
             },
         ) { padding ->
             Box(Modifier.fillMaxSize()) {
+                val openArticle: (dev.frontek.feeds.model.Article) -> Unit = {
+                    vm.markRead(it)
+                    reader = it
+                }
                 when (tab) {
-                    Tab.Home -> HomeScreen(vm, padding) { reader = it }
+                    Tab.Home -> HomeScreen(vm, padding, openArticle)
                     Tab.Favorites -> SavedScreen(
                         vm = vm,
                         items = vm.favorites,
                         title = stringResource(R.string.saved_favorites_title),
                         emptyText = stringResource(R.string.saved_favorites_empty),
                         contentPadding = padding,
-                        onOpenArticle = { reader = it },
+                        onOpenArticle = openArticle,
                     )
                     Tab.ReadLater -> SavedScreen(
                         vm = vm,
@@ -131,7 +135,7 @@ fun AppRoot(vm: AppViewModel) {
                         title = stringResource(R.string.saved_read_later_title),
                         emptyText = stringResource(R.string.saved_read_later_empty),
                         contentPadding = padding,
-                        onOpenArticle = { reader = it },
+                        onOpenArticle = openArticle,
                     )
                     Tab.Discover -> DiscoverScreen(vm, padding)
                 }
