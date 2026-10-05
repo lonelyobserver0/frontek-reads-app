@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RSS waves from assets/favicon.svg (64x64), scaled into the adaptive-icon safe zone -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="64" android:viewportHeight="64">
+    <group android:scaleX="0.62" android:scaleY="0.62" android:pivotX="32" android:pivotY="32">
+        <path android:fillColor="#E76F51"
+            android:pathData="M20,44m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+        <path android:strokeColor="#E9C46A" android:strokeWidth="6" android:strokeLineCap="round"
+            android:pathData="M15,30a19,19 0,0 1,19 19" />
+        <path android:strokeColor="#2A9D8F" android:strokeWidth="6" android:strokeLineCap="round"
+            android:pathData="M15,18a31,31 0,0 1,31 31" />
+    </group>
+</vector>

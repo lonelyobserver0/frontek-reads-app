@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Frontek Reads</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_read_later">Read later</string>
+    <string name="nav_discover">Discover</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_import">Import</string>
+    <string name="action_export">Export</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_close">Close</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_share">Share</string>
+    <string name="action_back">Back</string>
+    <string name="home_kicker">Your feed</string>
+    <string name="home_title">Latest from your subscriptions</string>
+    <string name="home_empty_title">No subscriptions</string>
+    <string name="home_empty_body">Subscribe to a few sites and their latest articles will show up here — kept privately on your device.</string>
+    <string name="filter_all">All</string>
+    <plurals name="subscriptions_count">
+        <item quantity="one">%d subscription</item>
+        <item quantity="other">%d subscriptions</item>
+    </plurals>
+    <plurals name="articles_count">
+        <item quantity="one">%d article</item>
+        <item quantity="other">%d articles</item>
+    </plurals>
+    <string name="card_read_here">Read here →</string>
+    <string name="read_badge">read</string>
+    <string name="fav_add">Add to favorites</string>
+    <string name="fav_remove">Remove from favorites</string>
+    <string name="read_later_add">Save to read later</string>
+    <string name="read_later_remove">Remove from read later</string>
+    <string name="saved_favorites_empty">Articles you mark as favorite will appear here.</string>
+    <string name="saved_read_later_empty">Articles you save to read later will appear here.</string>
+    <string name="discover_title">Find sites to follow</string>
+    <string name="discover_lead">Search the web for feeds, or paste any site / feed URL to subscribe.</string>
+    <string name="discover_search_placeholder">Search feeds, or paste a URL…</string>
+    <string name="discover_search_btn">Search</string>
+    <string name="discover_custom_url_label">Custom URL</string>
+    <string name="discover_find_subscribe">Find &amp; subscribe</string>
+    <string name="discover_searching">Searching…</string>
+    <string name="discover_subscribe">Subscribe</string>
+    <string name="discover_subscribed">✓ Subscribed</string>
+    <string name="discover_no_match">No match for “%1$s”. If it\'s a site, paste its full URL to subscribe directly.</string>
+    <string name="discover_your_subs">Your subscriptions</string>
+    <string name="discover_subs_empty">No subscriptions yet. Go to Discover to add your first feed.</string>
+    <string name="discover_search_fallback">No web results — showing matches from the built-in catalog.</string>
+    <string name="discover_privacy_note">Search queries are sent to Feedly to find feeds. Nothing else leaves your device.</string>
+    <string name="subs_manage_title">Manage feeds</string>
+    <string name="site_link">Site ↗</string>
+    <string name="reader_open_original">Open original ↗</string>
+    <string name="reader_read_full">Read full article</string>
+    <string name="reader_loading_full">Loading full article…</string>
+    <string name="reader_retry_full">Retry full article</string>
+    <string name="reader_feed_preview_note">Feed preview — this site doesn\'t allow full reading from here.</string>
+    <string name="no_preview">This feed provides no preview.</string>
+    <string name="untitled">(untitled)</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_text_size">Text size</string>
+    <string name="font_decrease">Decrease text size</string>
+    <string name="font_increase">Increase text size</string>
+    <string name="font_reset">Reset</string>
+    <string name="settings_language">Language</string>
+    <string name="lang_system">System default</string>
+    <string name="lang_italian" translatable="false">Italiano</string>
+    <string name="lang_english" translatable="false">English</string>
+    <string name="lang_spanish" translatable="false">Español</string>
+    <string name="lang_french" translatable="false">Français</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_clear_cache">Clear article cache</string>
+    <string name="settings_delete_all">Delete all my data</string>
+    <string name="confirm_delete_title">Delete everything?</string>
+    <string name="confirm_delete_body">This removes all subscriptions, favorites, cache and settings from this device.</string>
+    <string name="settings_about">A private, no-account RSS reader — part of frontek.dev.</string>
+    <string name="footer_backup">Your subscriptions live only on this device. Export them to keep a backup.</string>
+    <plurals name="status_refreshing">
+        <item quantity="one">Refreshing %d feed…</item>
+        <item quantity="other">Refreshing %d feeds…</item>
+    </plurals>
+    <string name="status_load_failed">Could not load: %1$s. Check your connection and refresh again.</string>
+    <string name="toast_subscribed_named">Subscribed to “%1$s”.</string>
+    <string name="toast_already_subscribed_named">Already subscribed to “%1$s”.</string>
+    <string name="toast_unsubscribed">Unsubscribed.</string>
+    <string name="toast_already_subscribed">Already subscribed.</string>
+    <string name="toast_no_feed_found">No RSS/Atom feed found there.</string>
+    <string name="toast_nothing_export">Nothing to export yet.</string>
+    <string name="toast_export_ok">Subscriptions exported.</string>
+    <string name="toast_export_fail">Export failed.</string>
+    <string name="toast_import_read_fail">Could not read that file.</string>
+    <string name="toast_no_new_feeds">No new feeds found in that file.</string>
+    <plurals name="feeds_imported">
+        <item quantity="one">Imported %d feed.</item>
+        <item quantity="other">Imported %d feeds.</item>
+    </plurals>
+    <string name="toast_cache_cleared">Cache cleared.</string>
+    <string name="toast_all_deleted">All data deleted.</string>
+    <string name="toast_fav_added">Added to favorites.</string>
+    <string name="toast_fav_removed">Removed from favorites.</string>
+    <string name="toast_read_later_added">Saved to read later.</string>
+    <string name="toast_read_later_removed">Removed from read later.</string>
+    <string name="time_minutes_ago">%dm ago</string>
+    <string name="time_hours_ago">%dh ago</string>
+    <string name="time_days_ago">%dd ago</string>
+</resources>

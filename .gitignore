@@ -1,0 +1,31 @@
+# Gradle / Kotlin
+.gradle/
+.kotlin/
+build/
+
+# Android Studio / IntelliJ
+*.iml
+.idea/
+/captures/
+.externalNativeBuild/
+.cxx/
+.navigation/
+
+# Machine-specific
+/local.properties
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+output-metadata.json
+
+# Signing keys: never commit
+*.jks
+*.keystore
+keystore.properties
+
+# OS
+.DS_Store
+Thumbs.db
